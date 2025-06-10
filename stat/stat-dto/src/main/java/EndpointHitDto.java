@@ -10,7 +10,7 @@ import lombok.experimental.FieldDefaults;
 @NoArgsConstructor
 @AllArgsConstructor
 @Builder
-public class StatAnswer {
+public class EndpointHitDto {
     String app;
     String uri;
     Long hits;

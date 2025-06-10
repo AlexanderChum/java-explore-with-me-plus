@@ -1,4 +1,5 @@
 import jakarta.validation.constraints.NotBlank;
+import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Pattern;
 import jakarta.validation.constraints.Size;
 import lombok.AccessLevel;
@@ -23,18 +24,18 @@ public class StatDto {
     @Size(max = 200, message = "Слишком длинный параметр app")
     String app;
 
-    @Size(max = 200, message = "Слишком длинный URI")
+    @NotNull(message = "URI не может быть пустым")
+    @Size(max = 200, message = "Слишком длинный URI: MAX = 200")
     @Pattern(regexp = "^/.*", message = "URI должен начинаться со слеша")
     String uri;
 
+    @NotNull(message = "Ip адрес не может быть пустым")
     @Pattern(regexp = "^((25[0-5]|2[0-4][0-9]|1[0-9]{2}|[1-9][0-9]|[0-9])\\.)" +
             "{3}(25[0-5]|2[0-4][0-9]|1[0-9]{2}|[1-9][0-9]|[0-9])$",
             message = "Некорректный ip адрес")
     String ip;
 
+    @NotNull(message = "Поле timestamp не может быть пустым")
     @DateTimeFormat(pattern = "yyyy-MM-dd HH:mm:ss")
     LocalDateTime timestamp;
-    /*в спецификации указан тип String для данного поля, но я не уверен что он подходит учитывая то что в будущем мы
-    будем работать со временем
-     */
 }
