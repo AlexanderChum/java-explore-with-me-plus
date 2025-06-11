@@ -9,10 +9,12 @@ import org.springframework.web.util.UriComponentsBuilder;
 import org.springframework.web.client.RestTemplate;
 
 import java.time.LocalDateTime;
-import java.time.ZoneOffset;
 import java.time.format.DateTimeFormatter;
 import java.util.Arrays;
 import java.util.List;
+
+import stat.dto.EndpointHitDto;
+import stat.dto.StatDto;
 
 @Service
 public class StatsClient {
