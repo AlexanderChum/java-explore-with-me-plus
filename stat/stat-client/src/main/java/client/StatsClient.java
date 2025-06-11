@@ -12,9 +12,8 @@ import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.Arrays;
 import java.util.List;
-
 import stat.dto.EndpointHitDto;
-import stat.dto.StatDto;
+import stat.dto.ViewStatsDto;
 
 @Service
 public class StatsClient {
