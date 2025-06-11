@@ -10,6 +10,7 @@ import org.springframework.web.client.RestTemplate;
 
 import java.time.LocalDateTime;
 import java.time.ZoneOffset;
+import java.time.format.DateTimeFormatter;
 import java.util.Arrays;
 import java.util.List;
 
@@ -18,6 +19,7 @@ public class StatsClient {
 
     private final RestTemplate restTemplate;
     private final String baseUrl;
+    private final DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss");
 
     public StatsClient(@Value("http://localhost:9090")String baseUrl, RestTemplate restTemplate) {
         this.baseUrl = baseUrl;
@@ -30,8 +32,8 @@ public class StatsClient {
     }
 
     public List<StatDto > getStatistics(LocalDateTime start, LocalDateTime end, List<String> uris, boolean unique) {
-        String startStr = start.atZone(ZoneOffset.UTC).toString();
-        String endStr = end.atZone(ZoneOffset.UTC).toString();
+        String startStr = start.format(formatter);
+        String endStr = end.format(formatter);
 
         UriComponentsBuilder builder = UriComponentsBuilder.fromHttpUrl(baseUrl)
                 .path("/stats")
