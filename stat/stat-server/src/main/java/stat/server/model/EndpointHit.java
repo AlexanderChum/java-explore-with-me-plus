@@ -14,6 +14,7 @@ import java.util.Objects;
 @Builder
 @FieldDefaults(level = AccessLevel.PRIVATE)
 @Entity
+@Table(name = "endpoint_hit")
 public class EndpointHit {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
