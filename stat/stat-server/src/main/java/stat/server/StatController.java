@@ -8,7 +8,7 @@ import org.springframework.format.annotation.DateTimeFormat;
 import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.*;
 import stat.dto.EndpointHitDto;
-import stat.dto.StatDto;
+import stat.dto.ViewStatsDto;
 import stat.server.service.StatService;
 
 import java.time.LocalDateTime;
@@ -50,7 +50,7 @@ public class StatController {
      */
     @GetMapping("/stats")
     @ResponseStatus(HttpStatus.OK)
-    public List<StatDto> getStats(
+    public List<ViewStatsDto> getStats(
             @RequestParam(name = "start")
             @DateTimeFormat(pattern = DATE_TIME_FORMAT_PATTERN)
             LocalDateTime start,

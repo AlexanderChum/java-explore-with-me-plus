@@ -6,9 +6,10 @@ import java.util.List;
 import stat.dto.EndpointHitDto;
 import stat.dto.ViewStatsDto;
 
+@SuppressWarnings("unused")
 public interface ClientBase {
 
-        ResponseEntity<ViewStatsDto> postHit(ViewStatsDto dto);
+        ResponseEntity<EndpointHitDto> postHit(EndpointHitDto endpointHitDto);
 
-        List<EndpointHitDto> getStatistics(LocalDateTime start, LocalDateTime end, List<String> uris, boolean unique);
+        List<ViewStatsDto> getStatistics(LocalDateTime start, LocalDateTime end, List<String> uris, boolean unique);
 }

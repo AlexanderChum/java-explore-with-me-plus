@@ -1,7 +1,7 @@
 package stat.server.service;
 
 import stat.dto.EndpointHitDto;
-import stat.dto.StatDto;
+import stat.dto.ViewStatsDto;
 
 import java.time.LocalDateTime;
 import java.util.List;
@@ -9,5 +9,5 @@ import java.util.List;
 public interface StatService {
     EndpointHitDto saveHit(EndpointHitDto endpointHitDto);
 
-    List<StatDto> getStats(LocalDateTime start, LocalDateTime end, List<String> uris, Boolean unique);
+    List<ViewStatsDto> getStats(LocalDateTime start, LocalDateTime end, List<String> uris, Boolean unique);
 }

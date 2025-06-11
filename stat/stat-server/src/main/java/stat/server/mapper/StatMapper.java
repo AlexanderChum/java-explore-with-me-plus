@@ -3,18 +3,18 @@ package stat.server.mapper;
 import lombok.AccessLevel;
 import lombok.NoArgsConstructor;
 import stat.dto.EndpointHitDto;
-import stat.dto.StatDto;
 import stat.server.model.EndpointHit;
 
+@SuppressWarnings("unused")
 @NoArgsConstructor(access = AccessLevel.PRIVATE)
 public class StatMapper {
 
-    public static EndpointHit toEndpointHit(StatDto statDto) {
+    public static EndpointHit toEndpointHit(EndpointHitDto endpointHitDto) {
         return EndpointHit.builder()
-                .app(statDto.getApp())
-                .uri(statDto.getUri())
-                .ip(statDto.getIp())
-                .timestamp(statDto.getTimestamp())
+                .app(endpointHitDto.getApp())
+                .uri(endpointHitDto.getUri())
+                .ip(endpointHitDto.getIp())
+                .timestamp(endpointHitDto.getTimestamp())
                 .build();
     }
 
