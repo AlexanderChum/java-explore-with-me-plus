@@ -28,9 +28,9 @@ public class StatsClient {
         this.restTemplate = restTemplate;
     }
 
-    public ResponseEntity<Void> postHit(ViewStatsDto viewStatsDtostatDto) {
+    public ResponseEntity<Void> postHit(ViewStatsDto viewStatsDto) {
         String url = baseUrl + "/hit";
-        return restTemplate.postForEntity(url, viewStatsDtostatDto, Void.class);
+        return restTemplate.postForEntity(url, viewStatsDto, Void.class);
     }
 
     public List<EndpointHitDto > getStatistics(LocalDateTime start, LocalDateTime end, List<String> uris, boolean unique) {
