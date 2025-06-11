@@ -8,9 +8,8 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import stat.dto.EndpointHitDto;
 import stat.dto.ViewStatsDto;
+import stat.server.exception.ValidationException;
 import stat.server.mapper.StatMap;
-import stat.server.mapper.StatMapper;
-import stat.server.model.EndpointHit;
 import stat.server.repository.StatRepository;
 
 import java.time.LocalDateTime;
@@ -24,20 +23,28 @@ import java.util.List;
 @SuppressWarnings("unused")
 public class StatServiceImpl implements StatService {
     StatMap statMap;
-    StatRepository repository;
+    StatRepository statRepository;
 
     @Override
     @Transactional
     public EndpointHitDto saveHit(EndpointHitDto endpointHitDto) {
-        EndpointHit endpointHit = StatMapper.toEndpointHit(endpointHitDto);
-        return statMap.toEndpointHitDto(repository.save(endpointHit));
+        return statMap.toEndpointHitDto(statRepository.save(statMap.toEndpointHit(endpointHitDto)));
     }
 
     @Override
-    public List<ViewStatsDto> getStats(LocalDateTime start, LocalDateTime end, List<String> uris, Boolean unique) {
-        // Возвращается List<StatDto>?
-        // Или List<EndpointHitDto>?
-        // TODO: дописать логику
-        return List.of();
+    public List<ViewStatsDto> getStats(LocalDateTime startDate, LocalDateTime endDate, List<String> uris, Boolean unique) {
+        log.debug("Service: Запрашиваем статистику с параметрами: start={}, end={}, uris={}, unique={}",
+                startDate, endDate, uris, unique);
+
+        if (startDate.isAfter(endDate)) {
+            log.warn("Ошибка в датах: дата начала {} после даты окончания {}", startDate, endDate);
+            throw new ValidationException("Дата начала не должна быть позже даты окончания");
+        }
+
+        if (unique) {
+            return statRepository.getStats(startDate, endDate, uris);
+        } else {
+            return statRepository.getUniqueStats(startDate, endDate, uris);
+        }
     }
 }

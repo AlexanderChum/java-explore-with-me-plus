@@ -66,6 +66,6 @@ public class StatController {
         log.debug("Параметры запроса: start={}, end={}, uris={}, unique={}",
                 start, end, uris, unique);
 
-        return statService.getStats(start, end, uris, unique);
+        return statService.getStats(start, end, (uris == null || uris.isEmpty() ? null : uris), unique);
     }
 }
