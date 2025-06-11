@@ -28,7 +28,7 @@ public class StatsClient {
         this.restTemplate = restTemplate;
     }
 
-    public ResponseEntity<Void> postHit(StatDto statDto) {
+    public ResponseEntity<Void> postHit(ViewStatsDto viewStatsDtostatDto) {
         String url = baseUrl + "/hit";
         return restTemplate.postForEntity(url, statDto, Void.class);
     }
