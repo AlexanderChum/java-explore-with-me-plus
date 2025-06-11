@@ -30,7 +30,7 @@ public class StatsClient {
 
     public ResponseEntity<Void> postHit(ViewStatsDto viewStatsDtostatDto) {
         String url = baseUrl + "/hit";
-        return restTemplate.postForEntity(url, statDto, Void.class);
+        return restTemplate.postForEntity(url, viewStatsDtostatDto, Void.class);
     }
 
     public List<EndpointHitDto > getStatistics(LocalDateTime start, LocalDateTime end, List<String> uris, boolean unique) {
