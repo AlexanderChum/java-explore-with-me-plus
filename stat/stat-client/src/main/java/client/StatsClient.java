@@ -28,12 +28,12 @@ public class StatsClient {
         this.restTemplate = restTemplate;
     }
 
-    public ResponseEntity<Void> postHit(EndpointHitDto endpointHit) {
+    public ResponseEntity<Void> postHit(StatDto statDto) {
         String url = baseUrl + "/hit";
-        return restTemplate.postForEntity(url, endpointHit, Void.class);
+        return restTemplate.postForEntity(url, statDto, Void.class);
     }
 
-    public List<StatDto > getStatistics(LocalDateTime start, LocalDateTime end, List<String> uris, boolean unique) {
+    public List<EndpointHitDto > getStatistics(LocalDateTime start, LocalDateTime end, List<String> uris, boolean unique) {
         String startStr = start.format(formatter);
         String endStr = end.format(formatter);
 
@@ -49,11 +49,11 @@ public class StatsClient {
         }
 
         String url = builder.toUriString();
-        ResponseEntity<StatDto[]> response = restTemplate.exchange(
+        ResponseEntity<EndpointHitDto[]> response = restTemplate.exchange(
                 url,
                 HttpMethod.GET,
                 HttpEntity.EMPTY,
-                StatDto[].class
+                EndpointHitDto[].class
         );
         return Arrays.asList(response.getBody());
     }

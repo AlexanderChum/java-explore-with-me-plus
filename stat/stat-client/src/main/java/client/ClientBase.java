@@ -8,5 +8,5 @@ public interface ClientBase {
 
         ResponseEntity<Void> postHit(StatDto dto);
 
-        List<StatAnswer> getStatistics(LocalDateTime start, LocalDateTime end, List<String> uris, boolean unique);
+        List<EndpointHitDto> getStatistics(LocalDateTime start, LocalDateTime end, List<String> uris, boolean unique);
 }
