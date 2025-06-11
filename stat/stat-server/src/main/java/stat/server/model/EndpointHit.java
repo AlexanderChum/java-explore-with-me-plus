@@ -48,6 +48,6 @@ public class EndpointHit {
 
     @Override
     public int hashCode() {
-        return id != null ? Objects.hash(id) : Objects.hash(id, app, uri, ip, timestamp);
+        return id != null ? Objects.hash(id) : Objects.hash(app, uri, ip, timestamp);
     }
 }
