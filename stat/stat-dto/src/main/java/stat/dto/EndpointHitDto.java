@@ -1,3 +1,5 @@
+package stat.dto;
+
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Pattern;
@@ -17,7 +19,7 @@ import java.time.LocalDateTime;
 @AllArgsConstructor
 @NoArgsConstructor
 @Builder
-public class StatDto {
+public class EndpointHitDto {
     Long id;
 
     @NotBlank(message = "Параметр app не должен быть пустым")

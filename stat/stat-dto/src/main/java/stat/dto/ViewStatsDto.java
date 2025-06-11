@@ -1,3 +1,5 @@
+package stat.dto;
+
 import lombok.AccessLevel;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -10,7 +12,7 @@ import lombok.experimental.FieldDefaults;
 @NoArgsConstructor
 @AllArgsConstructor
 @Builder
-public class EndpointHitDto {
+public class ViewStatsDto {
     String app;
     String uri;
     Long hits;
