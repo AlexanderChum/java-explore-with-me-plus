@@ -1,7 +1,6 @@
 package client;
 
 import org.springframework.beans.factory.annotation.Value;
-import org.springframework.boot.web.client.RestTemplateBuilder;
 import org.springframework.http.HttpEntity;
 import org.springframework.http.HttpMethod;
 import org.springframework.http.ResponseEntity;
@@ -14,32 +13,30 @@ import java.time.ZoneOffset;
 import java.util.Arrays;
 import java.util.List;
 
-import static org.springframework.http.RequestEntity.post;
-
 @Service
 public class StatsClient {
 
     private final RestTemplate restTemplate;
+    private final String baseUrl;
 
-    @Value("http://localhost:9090")
-    private String statsServiceUrl;
-
-    public StatsClient(RestTemplateBuilder builder) {
-        this.restTemplate = builder.build();
+    public StatsClient(@Value("http://localhost:9090")String baseUrl, RestTemplate restTemplate) {
+        this.baseUrl = baseUrl;
+        this.restTemplate = restTemplate;
     }
 
-    public ResponseEntity<?> postHit(StatDto dto) {
-        return post("/hit", dto);
+    public ResponseEntity<Void> postHit(EndpointHitDto endpointHit) {
+        String url = baseUrl + "/hit";
+        return restTemplate.postForEntity(url, endpointHit, Void.class);
     }
 
-    public List<StatAnswer> getStatistics(LocalDateTime start, LocalDateTime end, List<String> uris, boolean unique) {
-        long startTimestamp = start.toInstant(ZoneOffset.UTC).toEpochMilli();
-        long endTimestamp = end.toInstant(ZoneOffset.UTC).toEpochMilli();
+    public List<StatDto > getStatistics(LocalDateTime start, LocalDateTime end, List<String> uris, boolean unique) {
+        String startStr = start.atZone(ZoneOffset.UTC).toString();
+        String endStr = end.atZone(ZoneOffset.UTC).toString();
 
-        UriComponentsBuilder builder = UriComponentsBuilder.fromHttpUrl(statsServiceUrl)
+        UriComponentsBuilder builder = UriComponentsBuilder.fromHttpUrl(baseUrl)
                 .path("/stats")
-                .queryParam("start", startTimestamp)
-                .queryParam("end", endTimestamp)
+                .queryParam("start", startStr)
+                .queryParam("end", endStr)
                 .queryParam("unique", unique);
 
         if (uris != null && !uris.isEmpty()) {
@@ -48,11 +45,11 @@ public class StatsClient {
         }
 
         String url = builder.toUriString();
-        ResponseEntity<StatAnswer[]> response = restTemplate.exchange(
+        ResponseEntity<StatDto[]> response = restTemplate.exchange(
                 url,
                 HttpMethod.GET,
                 HttpEntity.EMPTY,
-                StatAnswer[].class
+                StatDto[].class
         );
         return Arrays.asList(response.getBody());
     }

@@ -6,7 +6,7 @@ import java.util.List;
 
 public interface ClientBase {
 
-        void sendHit(StatDto hit);
+        ResponseEntity<Void> postHit(StatDto dto);
 
         List<StatAnswer> getStatistics(LocalDateTime start, LocalDateTime end, List<String> uris, boolean unique);
 }
