@@ -14,9 +14,6 @@
     <modules>
         <module>main-server</module>
 		<module>stat</module>
-		<module>stat/stat-dto</module>
-		<module>stat/stat-server</module>
-		<module>stat/stat-client</module>
 	</modules>
 
     <groupId>ru.practicum</groupId>
@@ -124,6 +121,7 @@
 							<groupId>org.projectlombok</groupId>
 							<artifactId>lombok-mapstruct-binding</artifactId>
 							<version>${lombok.mapstruct}</version>
+							<scope>provided</scope>
 						</dependency>
 
 						<dependency>

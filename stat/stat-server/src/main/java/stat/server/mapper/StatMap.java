@@ -12,6 +12,5 @@ public interface StatMap {
     @Mapping(target = "id", ignore = true)
     EndpointHit toEndpointHit(EndpointHitDto endpointHitDto);
 
-    @Mapping(target = "hits", ignore = true)
     EndpointHitDto toEndpointHitDto(EndpointHit endpointHit);
 }
