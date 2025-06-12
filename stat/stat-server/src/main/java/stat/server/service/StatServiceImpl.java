@@ -9,7 +9,7 @@ import org.springframework.transaction.annotation.Transactional;
 import stat.dto.EndpointHitDto;
 import stat.dto.ViewStatsDto;
 import stat.server.exception.ValidationException;
-import stat.server.mapper.StatMapper;
+import stat.server.mapper.StatMap;
 import stat.server.repository.StatRepository;
 
 import java.time.LocalDateTime;
@@ -22,13 +22,13 @@ import java.util.List;
 @FieldDefaults(level = AccessLevel.PRIVATE, makeFinal = true)
 @SuppressWarnings("unused")
 public class StatServiceImpl implements StatService {
-//    StatMap statMap;
+    StatMap statMap;
     StatRepository statRepository;
 
     @Override
     @Transactional
     public EndpointHitDto saveHit(EndpointHitDto endpointHitDto) {
-        return StatMapper.toEndpointHitDto(statRepository.save(StatMapper.toEndpointHit(endpointHitDto)));
+        return statMap.toEndpointHitDto(statRepository.save(statMap.toEndpointHit(endpointHitDto)));
     }
 
     @Override
@@ -42,9 +42,9 @@ public class StatServiceImpl implements StatService {
         }
 
         if (unique) {
-            return statRepository.getStats(startDate, endDate, uris);
-        } else {
             return statRepository.getUniqueStats(startDate, endDate, uris);
+        } else {
+            return statRepository.getStats(startDate, endDate, uris);
         }
     }
 }

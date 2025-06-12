@@ -52,9 +52,9 @@ public class EndpointHit {
             return id.equals(hit.id);
         }
         return Objects.equals(app, hit.app) &&
-               Objects.equals(uri, hit.uri) &&
-               Objects.equals(ip, hit.ip) &&
-               Objects.equals(timestamp, hit.timestamp);
+                Objects.equals(uri, hit.uri) &&
+                Objects.equals(ip, hit.ip) &&
+                Objects.equals(timestamp, hit.timestamp);
     }
 
     @Override
