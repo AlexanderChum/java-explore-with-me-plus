@@ -9,7 +9,7 @@ import stat.server.model.EndpointHit;
 @Mapper(componentModel = "spring")
 public interface StatMap {
 
-    @Mapping(target = "id", ignore = true)
+    //@Mapping(target = "id", ignore = true)
     EndpointHit toEndpointHit(EndpointHitDto endpointHitDto);
 
     EndpointHitDto toEndpointHitDto(EndpointHit endpointHit);
