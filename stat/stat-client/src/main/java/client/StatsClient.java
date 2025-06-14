@@ -21,7 +21,7 @@ public class StatsClient {
 
     private final RestTemplate restTemplate;
     private final String baseUrl;
-    private final DateTimeFormatter DATE_TIME_FORMATTER = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss");
+    private static final DateTimeFormatter DATE_TIME_FORMATTER = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss");
 
     public StatsClient(@Value("http://localhost:9090") String baseUrl, RestTemplate restTemplate) {
         this.baseUrl = baseUrl;
