@@ -1,17 +1,7 @@
 package stat.server.model;
 
-import jakarta.persistence.Column;
-import jakarta.persistence.Entity;
-import jakarta.persistence.GeneratedValue;
-import jakarta.persistence.GenerationType;
-import jakarta.persistence.Id;
-import jakarta.persistence.Table;
-import lombok.AccessLevel;
-import lombok.AllArgsConstructor;
-import lombok.Builder;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
-import lombok.Setter;
+import jakarta.persistence.*;
+import lombok.*;
 import lombok.experimental.FieldDefaults;
 
 import java.time.LocalDateTime;
@@ -28,19 +18,18 @@ import java.util.Objects;
 public class EndpointHit {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    @Column(nullable = false, updatable = false)
     Long id;
 
-    @Column(name = "app", nullable = false)
+    @Column(name = "app")
     String app;
 
-    @Column(name = "uri", nullable = false)
+    @Column(name = "uri")
     String uri;
 
-    @Column(name = "ip", nullable = false)
+    @Column(name = "ip")
     String ip;
 
-    @Column(name = "timestamp", nullable = false)
+    @Column(name = "timestamp")
     LocalDateTime timestamp;
 
     @Override

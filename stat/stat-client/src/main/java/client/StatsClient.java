@@ -21,7 +21,7 @@ public class StatsClient {
 
     private final RestTemplate restTemplate;
     private final String baseUrl;
-    private final DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss");
+    private final DateTimeFormatter DATE_TIME_FORMATTER = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss");
 
     public StatsClient(@Value("http://localhost:9090") String baseUrl, RestTemplate restTemplate) {
         this.baseUrl = baseUrl;
@@ -34,8 +34,8 @@ public class StatsClient {
     }
 
     public List<ViewStatsDto> getStatistics(LocalDateTime start, LocalDateTime end, List<String> uris, boolean unique) {
-        String startStr = start.format(formatter);
-        String endStr = end.format(formatter);
+        String startStr = start.format(DATE_TIME_FORMATTER);
+        String endStr = end.format(DATE_TIME_FORMATTER);
 
         UriComponentsBuilder builder = UriComponentsBuilder.fromHttpUrl(baseUrl)
                 .path("/stats")
