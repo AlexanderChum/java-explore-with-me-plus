@@ -58,11 +58,9 @@ public class StatController {
     public List<ViewStatsDto> getStats(@RequestParam(name = "start")
                                        @DateTimeFormat(pattern = DATE_TIME_FORMAT_PATTERN)
                                        LocalDateTime start,
-
                                        @RequestParam(name = "end")
                                        @DateTimeFormat(pattern = DATE_TIME_FORMAT_PATTERN)
                                        LocalDateTime end,
-
                                        @RequestParam(name = "uris", required = false) List<String> uris,
                                        @RequestParam(name = "unique", defaultValue = "false") Boolean unique) {
 
