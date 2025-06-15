@@ -15,13 +15,15 @@ import java.time.format.DateTimeFormatter;
 import java.util.Arrays;
 import java.util.List;
 
+import static stat.constant.Const.DATE_TIME_FORMAT;
+
 @Service
 @SuppressWarnings("unused")
 public class StatsClient {
 
     private final RestTemplate restTemplate;
     private final String baseUrl;
-    private static final DateTimeFormatter DATE_TIME_FORMATTER = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss");
+    private static final DateTimeFormatter DATE_TIME_FORMATTER = DateTimeFormatter.ofPattern(DATE_TIME_FORMAT);
 
     public StatsClient(@Value("http://localhost:9090") String baseUrl, RestTemplate restTemplate) {
         this.baseUrl = baseUrl;
