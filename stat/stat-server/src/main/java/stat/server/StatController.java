@@ -55,17 +55,16 @@ public class StatController {
      */
     @GetMapping("/stats")
     @ResponseStatus(HttpStatus.OK)
-    public List<ViewStatsDto> getStats(
-            @RequestParam(name = "start")
-            @DateTimeFormat(pattern = DATE_TIME_FORMAT_PATTERN)
-            LocalDateTime start,
+    public List<ViewStatsDto> getStats(@RequestParam(name = "start")
+                                       @DateTimeFormat(pattern = DATE_TIME_FORMAT_PATTERN)
+                                       LocalDateTime start,
 
-            @RequestParam(name = "end")
-            @DateTimeFormat(pattern = DATE_TIME_FORMAT_PATTERN)
-            LocalDateTime end,
+                                       @RequestParam(name = "end")
+                                       @DateTimeFormat(pattern = DATE_TIME_FORMAT_PATTERN)
+                                       LocalDateTime end,
 
-            @RequestParam(name = "uris", required = false) List<String> uris,
-            @RequestParam(name = "unique", defaultValue = "false") Boolean unique) {
+                                       @RequestParam(name = "uris", required = false) List<String> uris,
+                                       @RequestParam(name = "unique", defaultValue = "false") Boolean unique) {
 
         log.info("Controller: Запрос на получение статистики получен.");
         log.debug("Параметры запроса: start={}, end={}, uris={}, unique={}",
