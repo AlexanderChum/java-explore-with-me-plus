@@ -5,10 +5,16 @@ import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Pattern;
 import jakarta.validation.constraints.Size;
-import lombok.*;
+import lombok.AccessLevel;
+import lombok.AllArgsConstructor;
+import lombok.Builder;
+import lombok.Data;
+import lombok.NoArgsConstructor;
 import lombok.experimental.FieldDefaults;
 
 import java.time.LocalDateTime;
+
+import static stat.constant.Const.DATE_TIME_FORMAT;
 
 @Data
 @FieldDefaults(level = AccessLevel.PRIVATE)
@@ -31,6 +37,6 @@ public class EndpointHitDto {
     String ip;
 
     @NotNull(message = "Поле timestamp не может быть пустым")
-    @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss")
+    @JsonFormat(pattern = DATE_TIME_FORMAT)
     LocalDateTime timestamp;
 }
