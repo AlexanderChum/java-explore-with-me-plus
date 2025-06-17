@@ -1,0 +1,59 @@
+package main.server.user;
+
+import jakarta.validation.Valid;
+import jakarta.validation.constraints.Positive;
+import jakarta.validation.constraints.PositiveOrZero;
+import lombok.AccessLevel;
+import lombok.RequiredArgsConstructor;
+import lombok.experimental.FieldDefaults;
+import main.server.user.dto.NewUserDto;
+import main.server.user.dto.UpdateUserDto;
+import main.server.user.dto.UserDto;
+import main.server.user.service.UserService;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Sort;
+import org.springframework.http.HttpStatus;
+import org.springframework.web.bind.annotation.*;
+
+import java.util.List;
+
+@RestController
+@RequestMapping("/admin/users")
+@FieldDefaults(level = AccessLevel.PRIVATE, makeFinal = true)
+@RequiredArgsConstructor
+@SuppressWarnings("unused")
+public class UserController {
+    UserService userService;
+
+    @PostMapping
+    @ResponseStatus(HttpStatus.CREATED)
+    public UserDto createUser(@Valid @RequestBody NewUserDto newUserDto) {
+        return userService.createUser(newUserDto);
+    }
+
+    @DeleteMapping("/{id}")
+    @ResponseStatus(HttpStatus.NO_CONTENT)
+    public void deleteUserById(@PathVariable @Positive Long id) {
+        userService.deleteUserById(id);
+    }
+
+    @GetMapping
+    @ResponseStatus(HttpStatus.OK)
+    public List<UserDto> getUsers(@RequestParam(name = "ids", required = false) List<Long> userIds,
+                                     @PositiveOrZero
+                                     @RequestParam(name = "from", defaultValue = "0")
+                                     Integer from,
+                                     @Positive
+                                     @RequestParam(name = "size", defaultValue = "10")
+                                     Integer size) {
+        Sort sort = Sort.by("id").ascending();
+        PageRequest pageable = PageRequest.of(from, size, sort);
+
+        return userService.getUsers(userIds, pageable).toList();
+    }
+
+    @PatchMapping("/{userId}")
+    public UserDto updateUser(@PathVariable("userId") Long userId, @Valid @RequestBody UpdateUserDto updateUserDto) {
+        return userService.updateUser(userId, updateUserDto);
+    }
+}
