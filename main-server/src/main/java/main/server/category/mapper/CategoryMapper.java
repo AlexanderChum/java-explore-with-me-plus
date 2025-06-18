@@ -4,6 +4,7 @@ import lombok.AccessLevel;
 import lombok.NoArgsConstructor;
 import main.server.category.dto.CategoryDto;
 import main.server.category.dto.NewCategoryDto;
+import main.server.category.model.Category;
 
 @NoArgsConstructor(access = AccessLevel.PRIVATE)
 public class CategoryMapper {
