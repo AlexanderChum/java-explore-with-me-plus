@@ -43,4 +43,15 @@ public class ErrorHandler {
                 .timestamp(LocalDateTime.now())
                 .build();
     }
+
+    @ExceptionHandler(ConflictException.class)
+    @ResponseStatus(HttpStatus.CONFLICT)
+    public ApiError ExceptionHandle(Exception e) {
+        return ApiError.builder()
+                .status(HttpStatus.CONFLICT)
+                .reason("Нарушено ограничение целостности")
+                .message(e.getMessage())
+                .timestamp(LocalDateTime.now())
+                .build();
+    }
 }
