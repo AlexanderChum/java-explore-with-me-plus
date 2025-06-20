@@ -22,7 +22,7 @@ import java.util.List;
 @FieldDefaults(level = AccessLevel.PRIVATE, makeFinal = true)
 @RequiredArgsConstructor
 @SuppressWarnings("unused")
-public class UserController {
+public class AdminUserController {
     UserService userService;
 
     @PostMapping
