@@ -8,9 +8,15 @@ import java.util.List;
 import java.util.Optional;
 
 public interface RequestRepository extends JpaRepository<ParticipationRequest, Long> {
-    Optional<RequestRepository> findByEventIdAndRequesterId(Long eventId, Long requesterId);
+    Optional<ParticipationRequest> findByEventIdAndRequesterId(Long eventId, Long requesterId);
 
     int countByEventIdAndStatusEquals(Long eventId, RequestStatus requestStatus);
 
     List<ParticipationRequest> findAllByRequesterId(Long requesterId);
+
+    List<ParticipationRequest> findByEventId(Long eventId);
+
+    int countByIdInAndEventId(List<Long> requestIds, Long eventId);
+
+    List<ParticipationRequest> findAllByIdIn(List<Long> requestIds);
 }
