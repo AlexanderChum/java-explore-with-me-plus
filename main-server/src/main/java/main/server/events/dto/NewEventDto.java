@@ -28,6 +28,7 @@ public class NewEventDto {
     @NotBlank
     String annotation;
 
+    @NotNull
     Long category;
 
     @Size(min = 20, max = 7000)
@@ -35,6 +36,7 @@ public class NewEventDto {
     String description;
 
     @JsonFormat(pattern = DATE_TIME_FORMAT)
+    @NotNull
     LocalDateTime eventDate;
 
     Boolean paid;
