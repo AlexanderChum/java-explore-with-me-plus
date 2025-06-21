@@ -21,7 +21,7 @@ public class AdminController {
     }
 
     @PostMapping("/{eventId}")
-    public EventShortDto updateDto(@RequestBody UpdateEventAdminRequest updateEventAdminRequest,
+    public EventShortDto updateEvent(@RequestBody UpdateEventAdminRequest updateEventAdminRequest,
                                    @RequestParam Long eventId) {
         return null;
     }

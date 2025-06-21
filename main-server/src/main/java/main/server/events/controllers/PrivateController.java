@@ -42,7 +42,7 @@ public class PrivateController {
     }
 
     @GetMapping("/{eventId}/requests")
-    public EventRequestDto getEventRequests(@RequestParam Long userId,
+    public List<EventRequestDto> getEventRequests(@RequestParam Long userId,
                                             @RequestParam Long eventId) {
         return null;
     }

@@ -22,7 +22,7 @@ public class PublicController {
 
     @GetMapping("/{eventId}")
     @ResponseStatus(HttpStatus.ACCEPTED)
-    public EventShortDto getEvent(@RequestParam Long eventId) {
+    public EventShortDto getEventById(@RequestParam Long eventId) {
         return null;
     }
 }
