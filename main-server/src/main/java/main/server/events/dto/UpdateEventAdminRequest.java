@@ -6,19 +6,18 @@ import jakarta.validation.constraints.Size;
 import lombok.AccessLevel;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
-import lombok.Getter;
+import lombok.Data;
 import lombok.NoArgsConstructor;
 import lombok.RequiredArgsConstructor;
-import lombok.Setter;
 import lombok.experimental.FieldDefaults;
+import main.server.events.enums.EventState;
 import main.server.location.LocationDto;
 
 import java.time.LocalDateTime;
 
 import static stat.constant.Const.DATE_TIME_FORMAT;
 
-@Setter
-@Getter
+@Data
 @NoArgsConstructor
 @AllArgsConstructor
 @RequiredArgsConstructor
@@ -44,7 +43,7 @@ public class UpdateEventAdminRequest {
 
     Boolean requestModeration;
 
-    String state;
+    EventState state;
 
     @Size(min = 3, max = 120)
     String title;

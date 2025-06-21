@@ -4,9 +4,8 @@ import com.fasterxml.jackson.annotation.JsonFormat;
 import lombok.AccessLevel;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
-import lombok.Getter;
+import lombok.Data;
 import lombok.NoArgsConstructor;
-import lombok.Setter;
 import lombok.experimental.FieldDefaults;
 import main.server.user.dto.UserShortDto;
 
@@ -14,8 +13,7 @@ import java.time.LocalDateTime;
 
 import static stat.constant.Const.DATE_TIME_FORMAT;
 
-@Getter
-@Setter
+@Data
 @AllArgsConstructor
 @NoArgsConstructor
 @Builder

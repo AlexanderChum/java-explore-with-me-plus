@@ -40,7 +40,6 @@ public class EventModel {
     @JoinColumn(name = "category_id")
     Categories category;
 
-    @Column(???)
     Long confirmedRequests;
 
     @Column(name = "created_on")
@@ -53,7 +52,7 @@ public class EventModel {
     LocalDateTime eventDate;
 
     @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "user_id")
+    @JoinColumn(name = "initiator_id")
     User initiator;
 
     @Column(name = "paid")
@@ -77,6 +76,6 @@ public class EventModel {
     Long views; //как-то надо с сервера статистики это брать, видимо
 
     @ManyToOne(fetch = FetchType.LAZY)
-    @Column(name = "location")
+    @JoinColumn(name = "location_id")
     Location location;
 }

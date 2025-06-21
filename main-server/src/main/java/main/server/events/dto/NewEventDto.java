@@ -2,14 +2,14 @@ package main.server.events.dto;
 
 import com.fasterxml.jackson.annotation.JsonFormat;
 import jakarta.validation.constraints.NotBlank;
+import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.PositiveOrZero;
 import jakarta.validation.constraints.Size;
 import lombok.AccessLevel;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
-import lombok.Getter;
+import lombok.Data;
 import lombok.NoArgsConstructor;
-import lombok.Setter;
 import lombok.experimental.FieldDefaults;
 import main.server.location.LocationDto;
 
@@ -17,8 +17,7 @@ import java.time.LocalDateTime;
 
 import static stat.constant.Const.DATE_TIME_FORMAT;
 
-@Getter
-@Setter
+@Data
 @NoArgsConstructor
 @AllArgsConstructor
 @Builder
@@ -49,6 +48,6 @@ public class NewEventDto {
     @NotBlank
     String title;
 
-    @NotBlank
+    @NotNull
     LocationDto locationDto;
 }
