@@ -71,7 +71,6 @@ public class RequestServiceImpl implements RequestService {
     public List<ParticipationRequestDto> getCurrentUserEventRequests(Long initiatorId, Long eventId) {
         validateUserExist(initiatorId);
         validateEventExist(eventId);
-////eventRepository.existsByIdAndInitiatorId если будет возвращать boolean, то оставить, если optional, то переделать
 
         if (!eventRepository.existsByIdAndInitiatorId(eventId, initiatorId))
             throw new ConflictException(String.format("Событие с id= %d " +
@@ -92,7 +91,7 @@ public class RequestServiceImpl implements RequestService {
             throw new ConflictException("Только инициатор события может менять статус запроса на участие в событии");
         }
 
-        int limit = event.getParticipantLimit();
+        long limit = event.getParticipantLimit();
 
         EventRequestStatusUpdateResultDto result = new EventRequestStatusUpdateResultDto();
 
@@ -133,7 +132,7 @@ public class RequestServiceImpl implements RequestService {
         List<ParticipationRequestDto> rejectedRequests = new ArrayList<>();
         List<ParticipationRequestDto> confirmedRequests = new ArrayList<>();
 
-        int confirmedCount = limit -
+        long confirmedCount = limit -
                              requestRepository.countByEventIdAndStatusEquals(eventId, RequestStatus.CONFIRMED);
 
         requestsMap.values().forEach(request -> {
@@ -151,16 +150,12 @@ public class RequestServiceImpl implements RequestService {
             }
         });
 
-
         result.getConfirmedRequests().addAll(confirmedRequests);
         result.getRejectedRequests().addAll(rejectedRequests);
 
         requestRepository.saveAll(requestsMap.values());
 
-////уточнить как устанавливается количество подтвержденных заявок в event
-
-        eventRepository.setContirmedRequests(eventId,
-                requestRepository.countByEventIdAndStatusEquals(eventId, RequestStatus.CONFIRMED));
+        event.setConfirmedRequests(requestRepository.countByEventIdAndStatusEquals(eventId, RequestStatus.CONFIRMED));
 
         return result;
     }
@@ -177,19 +172,16 @@ public class RequestServiceImpl implements RequestService {
             throw new ConflictException("Нельзя участвовать в неопубликованном событии");
         }
 
-        int limit = event.getParticipantLimit();
+        long limit = event.getParticipantLimit();
 
         if (limit > 0 &&
-            requestRepository.countByEventIdAndStatusEquals(eventId, RequestStatus.CONFIRMED) == limit) {
+            requestRepository.countByEventIdAndStatusEquals(eventId, RequestStatus.CONFIRMED) >= limit) {
             throw new ConflictException("Достигнут лимит запросов на участие");
         }
 
         ParticipationRequest participationRequest = new ParticipationRequest();
         participationRequest.setRequester(requester);
         participationRequest.setEvent(event);
-
-/////скорректировать в зависимости от типа в EventModel,
-///// непонятно может ли быть уменьшен лимит после достижения максимального значения
 
         if (!event.getRequestModeration() || event.getParticipantLimit() == 0) {
             participationRequest.setStatus(RequestStatus.CONFIRMED);
