@@ -9,7 +9,7 @@ import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 import lombok.experimental.FieldDefaults;
-import main.server.events.enums.EventState;
+import main.server.events.enums.StateAction;
 import main.server.location.LocationDto;
 
 import java.time.LocalDateTime;
@@ -41,7 +41,7 @@ public class UpdateEventUserRequest {
 
     Boolean requestModeration;
 
-    EventState state;
+    StateAction state;
 
     @Size(min = 3, max = 120)
     String title;
