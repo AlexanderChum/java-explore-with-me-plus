@@ -17,6 +17,8 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 import lombok.experimental.FieldDefaults;
+import main.server.events.Categories;
+import main.server.events.enums.EventState;
 import main.server.location.Location;
 import main.server.user.model.User;
 
@@ -61,7 +63,7 @@ public class EventModel {
     Boolean paid;
 
     @Column(name = "participant_limit")
-    Integer participantLimit;
+    Long participantLimit;
 
     @Column(name = "published_on")
     LocalDateTime publishedOn;
@@ -71,7 +73,7 @@ public class EventModel {
 
     @Enumerated(EnumType.STRING)
     @Column(name = "state")
-    String state;
+    EventState state;
 
     @Column(name = "title")
     String title;

@@ -18,7 +18,8 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 import lombok.experimental.FieldDefaults;
-import main.server.event.model.EventModel;
+
+import main.server.events.model.EventModel;
 import main.server.user.model.User;
 import org.springframework.data.annotation.CreatedDate;
 

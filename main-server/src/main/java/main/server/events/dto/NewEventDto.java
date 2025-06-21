@@ -42,7 +42,7 @@ public class NewEventDto {
     Boolean paid;
 
     @PositiveOrZero
-    Integer participantsLimit;
+    Long participantsLimit;
 
     Boolean requestModeration;
 

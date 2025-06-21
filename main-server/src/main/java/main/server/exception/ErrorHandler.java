@@ -54,4 +54,15 @@ public class ErrorHandler {
                 .timestamp(LocalDateTime.now())
                 .build();
     }
+
+    @ExceptionHandler(BadRequestException.class)
+    @ResponseStatus(HttpStatus.BAD_REQUEST)
+    public ApiError BadRequestExceptionHandle(Exception e) {
+        return ApiError.builder()
+                .status(HttpStatus.BAD_REQUEST)
+                .reason("Некорректный запрос")
+                .message(e.getMessage())
+                .timestamp(LocalDateTime.now())
+                .build();
+    }
 }

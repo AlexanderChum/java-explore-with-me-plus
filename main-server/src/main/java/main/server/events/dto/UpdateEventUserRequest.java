@@ -1,6 +1,7 @@
 package main.server.events.dto;
 
 import com.fasterxml.jackson.annotation.JsonFormat;
+import com.fasterxml.jackson.annotation.JsonProperty;
 import jakarta.validation.constraints.PositiveOrZero;
 import jakarta.validation.constraints.Size;
 import lombok.AccessLevel;
@@ -9,6 +10,7 @@ import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 import lombok.experimental.FieldDefaults;
+import main.server.events.CategoryDto;
 import main.server.events.enums.StateAction;
 import main.server.location.LocationDto;
 
@@ -37,10 +39,11 @@ public class UpdateEventUserRequest {
     Boolean paid;
 
     @PositiveOrZero
-    Integer participantLimit;
+    Long participantLimit;
 
     Boolean requestModeration;
 
+    @JsonProperty("stateAction")
     StateAction state;
 
     @Size(min = 3, max = 120)

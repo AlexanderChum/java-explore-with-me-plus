@@ -4,6 +4,9 @@ import lombok.extern.slf4j.Slf4j;
 import main.server.events.dto.EventShortDto;
 import main.server.events.dto.NewEventDto;
 import main.server.events.dto.UpdateEventAdminRequest;
+import main.server.request.dto.EventRequestStatusUpdateRequestDto;
+import main.server.request.dto.EventRequestStatusUpdateResultDto;
+import main.server.request.dto.ParticipationRequestDto;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PatchMapping;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -42,15 +45,15 @@ public class PrivateController {
     }
 
     @GetMapping("/{eventId}/requests")
-    public List<EventRequestDto> getEventRequests(@RequestParam Long userId,
-                                            @RequestParam Long eventId) {
+    public List<ParticipationRequestDto> getEventRequests(@RequestParam Long userId,
+                                                          @RequestParam Long eventId) {
         return null;
     }
 
     @PatchMapping("/{eventId}/requests")
-    public EventRequestDto updateEventRequest(@RequestParam Long userId,
-                                              @RequestParam Long eventId,
-                                              @RequestBody UpdateEventRequestDto updateEventRequestDto) {
+    public EventRequestStatusUpdateResultDto updateEventRequest(@RequestParam Long userId,
+                                             @RequestParam Long eventId,
+                                             @RequestBody EventRequestStatusUpdateRequestDto updateEventRequestDto) {
         return null;
     }
 }

@@ -6,11 +6,14 @@ import lombok.experimental.FieldDefaults;
 import main.server.events.model.EventModel;
 import main.server.events.enums.EventState;
 import main.server.events.repository.EventRepository;
+import main.server.exception.BadRequestException;
 import main.server.exception.ConflictException;
 import main.server.exception.DuplicatedDataException;
 import main.server.exception.NotFoundException;
 import main.server.request.RequestMapper;
 import main.server.request.RequestRepository;
+import main.server.request.dto.EventRequestStatusUpdateRequestDto;
+import main.server.request.dto.EventRequestStatusUpdateResultDto;
 import main.server.request.dto.ParticipationRequestDto;
 import main.server.request.model.ParticipationRequest;
 import main.server.request.model.RequestStatus;
@@ -19,8 +22,12 @@ import main.server.user.model.User;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.util.ArrayList;
 import java.util.Comparator;
+import java.util.LinkedHashMap;
 import java.util.List;
+import java.util.function.Function;
+import java.util.stream.Collectors;
 
 @Service
 @FieldDefaults(level = AccessLevel.PRIVATE, makeFinal = true)
@@ -33,14 +40,14 @@ public class RequestServiceImpl implements RequestService {
     EventRepository eventRepository;
     UserRepository userRepository;
 
-    @Override
     @Transactional(readOnly = true)
+    @Override
     public List<ParticipationRequestDto> getRequests(Long requesterId) {
         validateUserExist(requesterId);
 
         return requestRepository.findAllByRequesterId(requesterId)
                 .stream()
-                .sorted(Comparator.comparing(ParticipationRequest::getCreated).reversed())
+                .sorted(Comparator.comparing(ParticipationRequest::getCreated))
                 .map(requestMapper::toParticipationRequestDto)
                 .toList();
     }
@@ -59,6 +66,100 @@ public class RequestServiceImpl implements RequestService {
         return requestMapper.toParticipationRequestDto(requestRepository.save(participationRequest));
     }
 
+    @Transactional(readOnly = true)
+    @Override
+    public List<ParticipationRequestDto> getCurrentUserEventRequests(Long initiatorId, Long eventId) {
+        validateUserExist(initiatorId);
+        validateEventExist(eventId);
+
+        if (!eventRepository.existsByIdAndInitiatorId(eventId, initiatorId))
+            throw new ConflictException(String.format("Событие с id= %d " +
+                                                      "с инициатором id= %d не найдено",eventId, initiatorId));
+        return requestRepository.findByEventId(eventId).stream()
+                .sorted(Comparator.comparing(ParticipationRequest::getCreated))
+                .map(requestMapper::toParticipationRequestDto).toList();
+    }
+
+    @Transactional(readOnly = true)
+    @Override
+    public EventRequestStatusUpdateResultDto updateParticipationRequestsStatus(Long initiatorId, Long eventId,
+                                                                               EventRequestStatusUpdateRequestDto eventRequestStatusUpdateRequestDto) {
+        validateUserExist(initiatorId);
+        EventModel event = validateEventExist(eventId);
+
+        if(!event.getInitiator().getId().equals(initiatorId)) {
+            throw new ConflictException("Только инициатор события может менять статус запроса на участие в событии");
+        }
+
+        long limit = event.getParticipantLimit();
+
+        EventRequestStatusUpdateResultDto result = new EventRequestStatusUpdateResultDto();
+
+        if (!event.getRequestModeration() || limit == 0) {
+            return result;
+        }
+
+        List<Long> requestIds = eventRequestStatusUpdateRequestDto.getRequestIds();
+        RequestStatus status = eventRequestStatusUpdateRequestDto.getStatus();
+
+        if (!status.equals(RequestStatus.REJECTED) && !status.equals(RequestStatus.CONFIRMED)) {
+            throw new BadRequestException("Статус должен быть REJECTED или CONFIRMED");
+        }
+
+        if (requestRepository.countByIdInAndEventId(requestIds, eventId) != requestIds.size()) {
+            throw new ConflictException(String.format("Не все запросы соответствуют событию с id= %d", eventId));
+        }
+
+        if (requestRepository
+                    .countByEventIdAndStatusEquals(eventId, RequestStatus.CONFIRMED) >= limit) {
+            throw new ConflictException(String.format("Уже достигнут лимит предела заявок на событие с id= %d", eventId));
+        }
+
+        LinkedHashMap<Long, ParticipationRequest> requestsMap = requestRepository.findAllByIdIn(requestIds)
+                .stream()
+                .sorted(Comparator.comparing(ParticipationRequest::getCreated))
+                .collect(Collectors.toMap(
+                        ParticipationRequest::getId,
+                        Function.identity(),
+                        (existing, replacement) -> existing,
+                        LinkedHashMap::new
+                ));
+
+        if (requestsMap.values().stream().anyMatch(request -> request.getStatus() != RequestStatus.PENDING)) {
+            throw new ConflictException("У всех запросов должен быть статус: PENDING");
+        }
+
+        List<ParticipationRequestDto> rejectedRequests = new ArrayList<>();
+        List<ParticipationRequestDto> confirmedRequests = new ArrayList<>();
+
+        long confirmedCount = limit -
+                             requestRepository.countByEventIdAndStatusEquals(eventId, RequestStatus.CONFIRMED);
+
+        requestsMap.values().forEach(request -> {
+            if (status == RequestStatus.REJECTED) {
+                request.setStatus(RequestStatus.REJECTED);
+                rejectedRequests.add(requestMapper.toParticipationRequestDto(request));
+            } else {
+                if (confirmedRequests.size() < confirmedCount) {
+                    request.setStatus(RequestStatus.CONFIRMED);
+                    confirmedRequests.add(requestMapper.toParticipationRequestDto(request));
+                } else {
+                    request.setStatus(RequestStatus.REJECTED);
+                    rejectedRequests.add(requestMapper.toParticipationRequestDto(request));
+                }
+            }
+        });
+
+        result.getConfirmedRequests().addAll(confirmedRequests);
+        result.getRejectedRequests().addAll(rejectedRequests);
+
+        requestRepository.saveAll(requestsMap.values());
+
+        event.setConfirmedRequests(requestRepository.countByEventIdAndStatusEquals(eventId, RequestStatus.CONFIRMED));
+
+        return result;
+    }
+
     private ParticipationRequest validateRequest(Long requesterId, Long eventId) {
         User requester = validateUserExist(requesterId);
         EventModel event = validateEventExist(eventId);
@@ -71,20 +172,16 @@ public class RequestServiceImpl implements RequestService {
             throw new ConflictException("Нельзя участвовать в неопубликованном событии");
         }
 
-        int limit = event.getParticipantLimit();
+        long limit = event.getParticipantLimit();
 
         if (limit > 0 &&
-            requestRepository.countByEventIdAndStatusEquals(eventId, RequestStatus.CONFIRMED) ==
-            limit) {
+            requestRepository.countByEventIdAndStatusEquals(eventId, RequestStatus.CONFIRMED) >= limit) {
             throw new ConflictException("Достигнут лимит запросов на участие");
         }
 
         ParticipationRequest participationRequest = new ParticipationRequest();
         participationRequest.setRequester(requester);
         participationRequest.setEvent(event);
-
-/////скорректировать в зависимости от типа в EventModel,
-///// непонятно может ли быть уменьшен лимит после достижения максимального значения
 
         if (!event.getRequestModeration() || event.getParticipantLimit() == 0) {
             participationRequest.setStatus(RequestStatus.CONFIRMED);
