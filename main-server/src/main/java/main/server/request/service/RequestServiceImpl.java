@@ -3,8 +3,9 @@ package main.server.request.service;
 import lombok.AccessLevel;
 import lombok.RequiredArgsConstructor;
 import lombok.experimental.FieldDefaults;
-import main.server.event.model.EventModel;
-import main.server.event.model.EventRepository;
+import main.server.events.model.EventModel;
+import main.server.events.enums.EventState;
+import main.server.events.repository.EventRepository;
 import main.server.exception.BadRequestException;
 import main.server.exception.ConflictException;
 import main.server.exception.DuplicatedDataException;
@@ -190,7 +191,7 @@ public class RequestServiceImpl implements RequestService {
 /////скорректировать в зависимости от типа в EventModel,
 ///// непонятно может ли быть уменьшен лимит после достижения максимального значения
 
-        if (!event.getRequestModeration() || limit == 0) {
+        if (!event.getRequestModeration() || event.getParticipantLimit() == 0) {
             participationRequest.setStatus(RequestStatus.CONFIRMED);
         } else {
             participationRequest.setStatus(RequestStatus.PENDING);
