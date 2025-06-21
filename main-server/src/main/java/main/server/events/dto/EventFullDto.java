@@ -1,52 +1,48 @@
 package main.server.events.dto;
 
 import com.fasterxml.jackson.annotation.JsonFormat;
-import jakarta.validation.constraints.PositiveOrZero;
-import jakarta.validation.constraints.Size;
 import lombok.AccessLevel;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
-import lombok.RequiredArgsConstructor;
 import lombok.experimental.FieldDefaults;
-import main.server.events.enums.StateActionAdmin;
+import main.server.events.enums.EventState;
 import main.server.location.LocationDto;
+import main.server.user.dto.UserDto;
 
 import java.time.LocalDateTime;
 
 import static stat.constant.Const.DATE_TIME_FORMAT;
 
 @Data
+@Builder
 @NoArgsConstructor
 @AllArgsConstructor
-@RequiredArgsConstructor
-@Builder
 @FieldDefaults(level = AccessLevel.PRIVATE)
-public class UpdateEventAdminRequest {
-
-    @Size(min = 20, max = 2000)
+public class EventFullDto {
+    Long id;
     String annotation;
+    CategoryDto categoryDto;
+    Long confirmedRequsests;
 
-    Long category;
+    @JsonFormat(pattern = DATE_TIME_FORMAT)
+    LocalDateTime createdOn;
 
-    @Size(min = 20, max = 7000)
     String description;
 
     @JsonFormat(pattern = DATE_TIME_FORMAT)
     LocalDateTime eventDate;
 
+    UserDto initiator;
+    LocationDto locationDto;
     Boolean paid;
-
-    @PositiveOrZero
     Integer participantLimit;
 
+    @JsonFormat(pattern = DATE_TIME_FORMAT)
+    LocalDateTime publishedOn;
     Boolean requestModeration;
-
-    StateActionAdmin state;
-
-    @Size(min = 3, max = 120)
+    EventState state;
     String title;
-
-    LocationDto locationDto;
+    Long views;
 }
