@@ -1,7 +1,11 @@
 package main.server.events.dto;
 
 import com.fasterxml.jackson.annotation.JsonFormat;
-import lombok.*;
+import lombok.AccessLevel;
+import lombok.AllArgsConstructor;
+import lombok.Builder;
+import lombok.Data;
+import lombok.NoArgsConstructor;
 import lombok.experimental.FieldDefaults;
 import main.server.category.dto.CategoryDto;
 import main.server.user.dto.UserShortDto;

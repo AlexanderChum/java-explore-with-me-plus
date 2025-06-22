@@ -1,31 +1,20 @@
 package main.server.category.mapper;
 
-import lombok.AccessLevel;
-import lombok.NoArgsConstructor;
 import main.server.category.dto.CategoryDto;
 import main.server.category.dto.NewCategoryDto;
 import main.server.category.model.Category;
+import org.mapstruct.Mapper;
+import org.mapstruct.Mapping;
+import org.mapstruct.MappingTarget;
 
-@NoArgsConstructor(access = AccessLevel.PRIVATE)
-public class CategoryMapper {
+@Mapper(componentModel = "spring")
+public interface CategoryMapper {
 
-    public static CategoryDto toCategoryDto(Category category) {
-        return CategoryDto.builder()
-                .id(category.getId())
-                .name(category.getName())
-                .build();
-    }
+    CategoryDto toCategoryDto(Category category);
 
-    public static Category toCategory(NewCategoryDto newCategoryDto) {
-        return Category.builder()
-                .name(newCategoryDto.getName())
-                .build();
-    }
+    @Mapping(target = "id", ignore = true)
+    Category toCategory(NewCategoryDto newCategoryDto);
 
-    public static Category updateCategory(CategoryDto categoryDto) {
-        return Category.builder()
-                .id(categoryDto.getId())
-                .name(categoryDto.getName())
-                .build();
-    }
+    @Mapping(target = "id", ignore = true)
+    void updateCategoryFromDto(CategoryDto categoryDto, @MappingTarget Category category);
 }
