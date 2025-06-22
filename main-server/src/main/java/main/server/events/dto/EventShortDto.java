@@ -3,7 +3,7 @@ package main.server.events.dto;
 import com.fasterxml.jackson.annotation.JsonFormat;
 import lombok.*;
 import lombok.experimental.FieldDefaults;
-import main.server.events.CategoryDto;
+import main.server.category.dto.CategoryDto;
 import main.server.user.dto.UserShortDto;
 
 import java.time.LocalDateTime;
