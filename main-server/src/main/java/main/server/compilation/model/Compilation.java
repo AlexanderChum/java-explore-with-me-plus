@@ -13,8 +13,9 @@ import jakarta.persistence.ManyToMany;
 import jakarta.persistence.Table;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
-import lombok.Data;
+import lombok.Getter;
 import lombok.NoArgsConstructor;
+import lombok.Setter;
 import main.server.events.model.EventModel;
 
 import java.util.HashSet;
@@ -22,7 +23,8 @@ import java.util.Set;
 
 @Entity
 @Table(name = "compilations")
-@Data
+@Getter
+@Setter
 @Builder
 @NoArgsConstructor
 @AllArgsConstructor
@@ -34,7 +36,7 @@ public class Compilation {
     @Column
     private Boolean pinned;
 
-    @Column(length = 50)
+    @Column
     private String title;
 
     @ManyToMany(fetch = FetchType.LAZY)
