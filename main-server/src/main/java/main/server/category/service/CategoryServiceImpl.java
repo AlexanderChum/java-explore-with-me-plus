@@ -1,5 +1,6 @@
 package main.server.category.service;
 
+import jakarta.validation.ValidationException;
 import lombok.RequiredArgsConstructor;
 import lombok.experimental.FieldDefaults;
 import main.server.category.dto.CategoryDto;
@@ -35,12 +36,24 @@ public class CategoryServiceImpl implements CategoryService {
     @Override
     @Transactional
     public CategoryDto updateCategory(Long catId, CategoryDto categoryDto) {
-        //TODO: дописать метод
+        if (categoryRepository.existsById(catId)) {
+            categoryDto.setId(catId);
+            return CategoryMapper.toCategoryDto(categoryRepository.save(CategoryMapper.updateCategory(categoryDto)));
+        } else {
+            throw new NotFoundException("Категория с id " + catId + " не найдена");
+        }
     }
 
     @Override
-    public List<CategoryDto> getAllCategories(Integer from, Integer size) {
-        //TODO: дописать метод
+    public List<CategoryDto> getCategories(Integer from, Integer size) {
+        if (from < 0 || size < 0) {
+            throw new ValidationException("Аргументы не могут быть отрицательными.");
+        }
+        return categoryRepository.findAll().stream()
+                .map(CategoryMapper::toCategoryDto)
+                .skip(from)
+                .limit(size)
+                .toList();
     }
 
     @Override
