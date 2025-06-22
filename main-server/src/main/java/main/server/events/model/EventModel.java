@@ -17,7 +17,7 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 import lombok.experimental.FieldDefaults;
-import main.server.events.Categories;
+import main.server.category.model.Category;
 import main.server.events.enums.EventState;
 import main.server.location.Location;
 import main.server.user.model.User;
@@ -42,7 +42,7 @@ public class EventModel {
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "category_id")
-    Categories category;
+    Category category;
 
     Long confirmedRequests;
 
