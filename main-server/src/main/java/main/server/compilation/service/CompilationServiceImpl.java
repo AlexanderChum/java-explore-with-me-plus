@@ -48,7 +48,7 @@ public class CompilationServiceImpl implements CompilationService {
     @Override
     public void deleteCompilation(Long compId) {
         if (!compilationRepository.existsById(compId)) {
-            throw new RuntimeException("Compilation not found"); // Или собственное исключение
+            throw new NotFoundException("Событие с id " + compId + " не найдено");
         }
         compilationRepository.deleteById(compId);
     }
@@ -57,7 +57,7 @@ public class CompilationServiceImpl implements CompilationService {
     @Override
     public CompilationDto updateCompilation(Long compId, CompilationUpdateDto updateDto) {
         Compilation compilation = compilationRepository.findById(compId)
-                .orElseThrow(() -> new RuntimeException("Compilation not found")); // Можно заменить на собственное исключение
+                .orElseThrow(() -> new NotFoundException("Событие с id " + compId + " не найдено"));
 
         if (updateDto.getTitle() != null) {
             compilation.setTitle(updateDto.getTitle());
@@ -77,7 +77,7 @@ public class CompilationServiceImpl implements CompilationService {
     @Override
     public CompilationDto getCompilationById(Long compId) {
         Compilation compilation = compilationRepository.findById(compId)
-                .orElseThrow(() -> new NotFoundException("Compilation not found"));
+                .orElseThrow(() -> new NotFoundException("Событие с id " + compId + " не найдено"));
         return compilationMapper.toDto(compilation);
     }
 

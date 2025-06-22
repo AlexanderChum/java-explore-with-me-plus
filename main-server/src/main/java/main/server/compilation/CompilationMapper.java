@@ -9,10 +9,8 @@ import org.mapstruct.factory.Mappers;
 
 import java.util.List;
 
-@Mapper(uses = {EventMapper.class})
+@Mapper(componentModel = "spring", uses = {EventMapper.class})
 public interface CompilationMapper {
-
-    CompilationMapper INSTANCE = Mappers.getMapper(CompilationMapper.class);
 
     @Mapping(target = "id", ignore = true)
     Compilation toEntity(NewCompilationDto dto);
