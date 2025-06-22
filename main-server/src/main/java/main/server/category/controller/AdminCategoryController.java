@@ -1,8 +1,6 @@
 package main.server.category.controller;
 
 import jakarta.validation.Valid;
-import jakarta.validation.constraints.Positive;
-import jakarta.validation.constraints.PositiveOrZero;
 import lombok.AccessLevel;
 import lombok.RequiredArgsConstructor;
 import lombok.experimental.FieldDefaults;
@@ -12,26 +10,24 @@ import main.server.category.dto.NewCategoryDto;
 import main.server.category.service.CategoryService;
 import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.DeleteMapping;
-import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PatchMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestController;
 
-import java.util.List;
-
 @RestController
+@RequestMapping("/admin/categories")
 @RequiredArgsConstructor
 @FieldDefaults(level = AccessLevel.PRIVATE, makeFinal = true)
 @Slf4j
-public class CategoryController {
+public class AdminCategoryController {
 
     CategoryService categoryService;
 
-    @PostMapping("/admin/categories")
+    @PostMapping
     @ResponseStatus(HttpStatus.CREATED)
     public CategoryDto createCategory(@Valid @RequestBody NewCategoryDto newCategoryDto) {
         log.info("Создание категории");
@@ -39,7 +35,7 @@ public class CategoryController {
         return categoryService.createCategory(newCategoryDto);
     }
 
-    @DeleteMapping("/admin/categories/{catId}")
+    @DeleteMapping("/{catId}")
     @ResponseStatus(HttpStatus.NO_CONTENT)
     public void deleteCategory(@PathVariable Long catId) {
         log.info("Удаление категории");
@@ -47,30 +43,11 @@ public class CategoryController {
         categoryService.deleteCategory(catId);
     }
 
-    @PatchMapping("/admin/categories/{catId}")
+    @PatchMapping("/{catId}")
     @ResponseStatus(HttpStatus.OK)
     public CategoryDto updateCategory(@PathVariable Long catId, @Valid @RequestBody CategoryDto categoryDto) {
         log.info("Обновление категории");
         log.debug("Поступил запрос на обновление категории: {}", categoryDto);
         return categoryService.updateCategory(catId, categoryDto);
-    }
-
-    @GetMapping("/categories")
-    @ResponseStatus(HttpStatus.OK)
-    public List<CategoryDto> getCategories(@PositiveOrZero @RequestParam(name = "from",
-                                                          defaultValue = "0") Integer from,
-                                              @Positive @RequestParam(name = "size",
-                                                      defaultValue = "10") Integer size) {
-        log.info("Получение списка категорий");
-        log.debug("Поступил запрос на получение списка категорий, параметры запроса: {}, {}", from, size);
-        return categoryService.getCategories(from, size);
-    }
-
-    @GetMapping("/categories/{catId}")
-    @ResponseStatus(HttpStatus.OK)
-    public CategoryDto getCategory(@PathVariable Long catId) {
-        log.info("Получение категории");
-        log.debug("Поступил запрос на получение категории с id: {}", catId);
-        return categoryService.getCategory(catId);
     }
 }
