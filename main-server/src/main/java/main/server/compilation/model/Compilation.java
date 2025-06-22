@@ -34,9 +34,4 @@ public class Compilation {
             inverseJoinColumns = @JoinColumn(name = "event_id")
     )
     private Set<EventModel> events = new HashSet<>();
-
-    @PreRemove
-    public void removeEvents() {
-        this.events.clear();
-    }
 }
