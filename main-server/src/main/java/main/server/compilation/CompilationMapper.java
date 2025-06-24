@@ -18,9 +18,6 @@ import java.util.stream.Collectors;
 @Mapper(componentModel = "spring", uses = {EventMapper.class})
 @Component
 public interface CompilationMapper {
-    @Autowired
-    EventRepository eventRepository = null;
-
     @Mapping(target = "id", ignore = true)
     @Mapping(target = "events", source = "events")
     Compilation toEntity(NewCompilationDto dto);
