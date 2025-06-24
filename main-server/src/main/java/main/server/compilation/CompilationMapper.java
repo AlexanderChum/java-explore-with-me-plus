@@ -36,8 +36,7 @@ public interface CompilationMapper {
                 .collect(Collectors.toSet());
     }
 
-    // Также обновим метод для принятия eventRepository
     default EventModel mapToEventModel(Long eventId, EventRepository eventRepository) {
-        return eventRepository.findById(eventId).orElse(null); // либо выбросить исключение
+        return eventRepository.findById(eventId).orElse(null);
     }
 }
