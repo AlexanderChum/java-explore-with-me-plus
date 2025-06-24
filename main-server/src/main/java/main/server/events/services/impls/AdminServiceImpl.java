@@ -14,6 +14,7 @@ import main.server.events.enums.StateActionAdmin;
 import main.server.events.mapper.EventMapper;
 import main.server.events.model.EventModel;
 import main.server.events.repository.EventRepository;
+import main.server.events.services.AdminService;
 import main.server.exception.ConflictException;
 import main.server.exception.NotFoundException;
 import main.server.location.LocationMapper;
@@ -26,7 +27,7 @@ import java.util.List;
 @Service
 @RequiredArgsConstructor
 @FieldDefaults(level = AccessLevel.PRIVATE, makeFinal = true)
-public class AdminServiceImpl {
+public class AdminServiceImpl implements AdminService {
     EventMapper eventMapper;
     EventRepository eventRepository;
     CategoryRepository categoryRepository;

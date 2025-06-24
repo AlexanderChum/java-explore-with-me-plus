@@ -8,6 +8,7 @@ import main.server.events.dto.EventShortDto;
 import main.server.events.mapper.EventMapper;
 import main.server.events.model.EventModel;
 import main.server.events.repository.EventRepository;
+import main.server.events.services.PublicService;
 import main.server.exception.NotFoundException;
 import main.server.statserver.StatsService;
 import org.springframework.stereotype.Service;
@@ -18,7 +19,7 @@ import java.util.List;
 @Service
 @Slf4j
 @RequiredArgsConstructor
-public class PublicServiceImpl {
+public class PublicServiceImpl implements PublicService {
     private final EventRepository eventRepository;
     private final EventMapper eventMapper;
 

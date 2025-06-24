@@ -16,6 +16,7 @@ import main.server.events.enums.StateAction;
 import main.server.events.mapper.EventMapper;
 import main.server.events.model.EventModel;
 import main.server.events.repository.EventRepository;
+import main.server.events.services.PrivateService;
 import main.server.exception.ConflictException;
 import main.server.exception.NotFoundException;
 import main.server.location.Location;
@@ -39,7 +40,7 @@ import java.util.stream.Collectors;
 @Slf4j
 @RequiredArgsConstructor
 @FieldDefaults(level = AccessLevel.PRIVATE, makeFinal = true)
-public class PrivateServiceImpl {
+public class PrivateServiceImpl implements PrivateService {
     EventRepository eventRepository;
     EventMapper eventMapper;
     UserRepository userRepository;
