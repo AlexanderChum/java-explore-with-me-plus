@@ -13,8 +13,8 @@ import main.server.events.dto.UpdateEventAdminRequest;
 import main.server.events.services.AdminService;
 import org.springframework.format.annotation.DateTimeFormat;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PatchMapping;
 import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
@@ -31,7 +31,7 @@ import static stat.constant.Const.DATE_TIME_FORMAT;
 public class AdminController {
     AdminService adminService;
 
-    @PostMapping("/{eventId}")
+    @PatchMapping("/{eventId}")
     public EventShortDto updateEvent(@Valid @RequestBody UpdateEventAdminRequest updateEventAdminRequest,
                                      @PathVariable @Positive Long eventId) {
         log.info("Получен запрос на обновление события у админа");

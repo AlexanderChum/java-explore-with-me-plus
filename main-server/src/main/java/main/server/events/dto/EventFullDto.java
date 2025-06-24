@@ -25,7 +25,7 @@ public class EventFullDto {
     @JsonProperty("category")
     CategoryDto categoryDto;
 
-    Long confirmedRequsests;
+    Long confirmedRequests;
 
     @JsonFormat(pattern = DATE_TIME_FORMAT)
     LocalDateTime createdOn;

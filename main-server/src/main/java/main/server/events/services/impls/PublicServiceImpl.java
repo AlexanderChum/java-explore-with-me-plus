@@ -23,7 +23,7 @@ public class PublicServiceImpl {
     private final EventMapper eventMapper;
 
     public List<EventShortDto> getEventsWithFilters(EventPublicParams eventParams, HttpServletRequest request) {
-        StatsService.addView(request);
+        /*StatsService.addView(request);
 
         //спросить у Андрея, есть ли опция написать запрос с помощью Q класса
 
@@ -31,6 +31,8 @@ public class PublicServiceImpl {
         );
 
         //дальше для каждого события достаем количество просмотров из мапы, полученной с сервера статистики
+
+         */
         return null;
     }
 

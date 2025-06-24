@@ -1,6 +1,8 @@
 package main.server.events.dto;
 
 import com.fasterxml.jackson.annotation.JsonFormat;
+import com.fasterxml.jackson.annotation.JsonProperty;
+import jakarta.validation.constraints.Future;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.PositiveOrZero;
@@ -24,32 +26,34 @@ import static stat.constant.Const.DATE_TIME_FORMAT;
 @FieldDefaults(level = AccessLevel.PRIVATE)
 public class NewEventDto {
 
-    @Size(min = 20, max = 2000)
-    @NotBlank
+    @Size(min = 20, max = 2000, message = "Поле annotation должно быть от 20 до 2000 символов")
+    @NotBlank(message = "Поле annotation не может быть пустым")
     String annotation;
 
-    @NotNull
+    @NotNull(message = "Поле category не может быть пустым")
     Long category;
 
-    @Size(min = 20, max = 7000)
-    @NotBlank
+    @Size(min = 20, max = 7000, message = "Поле description должно быть от 20 до 7000 символов")
+    @NotBlank(message = "Поле description не может быть пустым")
     String description;
 
     @JsonFormat(pattern = DATE_TIME_FORMAT)
-    @NotNull
+    @NotNull(message = "Поле eventDate не может быть пустым")
+    @Future(message = "Поле eventDate должно быть в будущем")
     LocalDateTime eventDate;
 
     Boolean paid;
 
-    @PositiveOrZero
+    @PositiveOrZero(message = "Лимит участников должен быть положительным или равен нулю.")
     Long participantsLimit;
 
     Boolean requestModeration;
 
-    @Size(min = 3, max = 120)
-    @NotBlank
+    @Size(min = 3, max = 120, message = "Поле title должно быть от 3 до 120 символов")
+    @NotBlank(message = "Поле title не может быть пустым")
     String title;
 
-    @NotNull
+    @NotNull(message = "Поле location не может быть пустым")
+    @JsonProperty("location")
     LocationDto locationDto;
 }

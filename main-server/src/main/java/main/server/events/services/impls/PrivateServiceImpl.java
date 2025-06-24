@@ -1,6 +1,5 @@
 package main.server.events.services.impls;
 
-import jakarta.persistence.EntityNotFoundException;
 import jakarta.servlet.http.HttpServletRequest;
 import lombok.AccessLevel;
 import lombok.RequiredArgsConstructor;
@@ -9,6 +8,7 @@ import lombok.extern.slf4j.Slf4j;
 import main.server.category.model.Category;
 import main.server.category.repository.CategoryRepository;
 import main.server.events.dto.EventFullDto;
+import main.server.events.dto.EventShortDto;
 import main.server.events.dto.NewEventDto;
 import main.server.events.dto.UpdateEventUserRequest;
 import main.server.events.enums.EventState;
@@ -17,6 +17,7 @@ import main.server.events.mapper.EventMapper;
 import main.server.events.model.EventModel;
 import main.server.events.repository.EventRepository;
 import main.server.exception.ConflictException;
+import main.server.exception.NotFoundException;
 import main.server.location.Location;
 import main.server.location.LocationMapper;
 import main.server.location.LocationRepository;
@@ -67,10 +68,10 @@ public class PrivateServiceImpl {
     public EventFullDto updateEventByEventId(UpdateEventUserRequest update, Long userId, Long eventId) {
         userExistence(userId);
         EventModel event = eventRepository.findById(eventId)
-                .orElseThrow(() -> new EntityNotFoundException("Событие не найдено"));
+                .orElseThrow(() -> new NotFoundException(String.format("Событие  c id= %d не найдено", eventId)));
 
         if (event.getState() == EventState.PUBLISHED) {
-            throw new ConflictException("Невозможно обновить событие");
+            throw new ConflictException("Невозможно обновить опубликованное событие");
         }
 
         changeEventState(event, update);
@@ -87,9 +88,9 @@ public class PrivateServiceImpl {
     }
 
     @Transactional(readOnly = true)
-    public List<EventFullDto> getUserEvents(Long userId, Integer from, Integer size, HttpServletRequest request) {
-        StatsService.addView(request);
+    public List<EventShortDto> getUserEvents(Long userId, Integer from, Integer size, HttpServletRequest request) {
         userExistence(userId);
+        StatsService.addView(request);
 
         Page<EventModel> events = eventRepository.findByInitiatorId(
                 userId,
@@ -99,7 +100,7 @@ public class PrivateServiceImpl {
         Map<Long, Long> views = StatsService.getAmountForEvents(events.getContent());
         return events.getContent().stream()
                 .map(event -> {
-                    EventFullDto dto = eventMapper.toFullDto(event);
+                    EventShortDto dto = eventMapper.toShortDto(event);
                     dto.setViews(views.getOrDefault(event.getId(), 0L));
                     return dto;
                 })
@@ -108,12 +109,13 @@ public class PrivateServiceImpl {
 
     @Transactional(readOnly = true)
     public EventFullDto getEventByEventId(Long userId, Long eventId, HttpServletRequest request) {
-        StatsService.addView(request);
         userExistence(userId);
-
         EventModel event = eventRepository.findByIdAndInitiatorId(eventId, userId)
-                .orElseThrow(() -> new EntityNotFoundException("Event not found"));
+                .orElseThrow(() -> new NotFoundException(String.format("Событие с id= %d " +
+                                       "у пользователя с id= %d не найдено", eventId, userId)));
 
+
+        StatsService.addView(request);
         EventFullDto result = eventMapper.toFullDto(event);
         result.setViews(StatsService.getAmount(
                 eventId,
@@ -125,12 +127,12 @@ public class PrivateServiceImpl {
 
     private User userExistence(Long userId) {
         return userRepository.findById(userId)
-                .orElseThrow(() -> new EntityNotFoundException("Пользователь не найден"));
+                .orElseThrow(() -> new NotFoundException(String.format("Пользователь c id= %d не найден", userId)));
     }
 
     private Category categoryExistence(Long categoryId) {
         return categoryRepository.findById(categoryId)
-                .orElseThrow(() -> new EntityNotFoundException("Категория не найдена"));
+                .orElseThrow(() -> new NotFoundException(String.format("Категория c id= %d не найдена", categoryId)));
     }
 
     private void changeEventState(EventModel event, UpdateEventUserRequest update) {

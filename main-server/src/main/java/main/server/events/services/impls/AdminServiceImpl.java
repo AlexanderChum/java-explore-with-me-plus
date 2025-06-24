@@ -33,12 +33,14 @@ public class AdminServiceImpl {
     LocationMapper locationMapper;
 
     public List<EventFullDto> getEventsWithAdminFilters(EventAdminParams eventParams, HttpServletRequest request) {
-        StatsService.addView(request);
+        /*StatsService.addView(request);
 
         //снова спроси у Андрея, аналогичный метод, с другими параметрами, возможно можно сделать одним запросным методом в репозиторий
 
         StatsService.getAmountForEvents(//сюда список вытащенных событий
                 );
+
+         */
         return null;
     }
 

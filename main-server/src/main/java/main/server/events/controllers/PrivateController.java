@@ -9,12 +9,14 @@ import lombok.RequiredArgsConstructor;
 import lombok.experimental.FieldDefaults;
 import lombok.extern.slf4j.Slf4j;
 import main.server.events.dto.EventFullDto;
+import main.server.events.dto.EventShortDto;
 import main.server.events.dto.NewEventDto;
 import main.server.events.dto.UpdateEventUserRequest;
 import main.server.events.services.PrivateService;
 import main.server.request.dto.EventRequestStatusUpdateRequestDto;
 import main.server.request.dto.EventRequestStatusUpdateResultDto;
 import main.server.request.dto.ParticipationRequestDto;
+import main.server.request.service.RequestService;
 import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PatchMapping;
@@ -33,22 +35,23 @@ import java.util.List;
 @FieldDefaults(level = AccessLevel.PRIVATE, makeFinal = true)
 public class PrivateController {
     PrivateService privateService;
+    RequestService requestService;
 
     @GetMapping
-    public List<EventFullDto> getUserEvents(@PathVariable
+    public List<EventShortDto> getUserEvents(@PathVariable
                                             @Positive
                                             Long userId,
 
-                                            @RequestParam(defaultValue = "0")
+                                             @RequestParam(defaultValue = "0")
                                             @PositiveOrZero
                                             Integer from,
 
-                                            @RequestParam(defaultValue = "10")
+                                             @RequestParam(defaultValue = "10")
                                             @Positive
                                             Integer size,
 
-                                            HttpServletRequest request) {
-        log.info("");
+                                             HttpServletRequest request) {
+        log.info("Получение событий, добавленных текущим пользователем");
         return privateService.getUserEvents(userId, from, size, request);
     }
 
@@ -56,7 +59,7 @@ public class PrivateController {
     @ResponseStatus(HttpStatus.CREATED)
     public EventFullDto createEvent(@Valid @RequestBody NewEventDto newEventDto,
                                     @PathVariable @Positive Long userId) {
-        log.info("");
+        log.info("Добавление нового события");
         return privateService.createEvent(newEventDto, userId);
     }
 
@@ -64,23 +67,23 @@ public class PrivateController {
     public EventFullDto getEventByEventIdAndUserId(@PathVariable @Positive Long userId,
                                                    @PathVariable @Positive Long eventId,
                                                    HttpServletRequest request) {
-        log.info("");
+        log.info("Получение полной информации о событии добавленном текущим пользователем");
         return privateService.getEventByEventId(userId, eventId, request);
     }
 
     @PatchMapping("/{eventId}")
-    public EventFullDto updateEventByEventId(@PathVariable Long userId,
-                                             @PathVariable Long eventId,
+    public EventFullDto updateEventByEventId(@PathVariable @Positive Long userId,
+                                             @PathVariable @Positive Long eventId,
                                              @RequestBody UpdateEventUserRequest updateEventDto) {
-        log.info("");
+        log.info("Изменение события, добавленного текущим пользователем");
         return privateService.updateEventByEventId(updateEventDto, userId, eventId);
     }
 
     @GetMapping("/{eventId}/requests")
     public List<ParticipationRequestDto> getEventRequestsByOwner(@PathVariable @Positive Long userId,
                                                                  @PathVariable @Positive Long eventId) {
-        log.info("");
-        return privateService.getEventRequests(userId, eventId);
+        log.info("Получение информации о запросах на участие в событии текущего пользователя");
+        return requestService.getCurrentUserEventRequests(userId, eventId);
     }
 
     @PatchMapping("/{eventId}/requests")
@@ -90,7 +93,7 @@ public class PrivateController {
                                                                 @RequestBody
                                                                 @Valid
                                                                 EventRequestStatusUpdateRequestDto update) {
-        log.info("");
-        return privateService.updateEventRequest(userId, eventId, update);
+        log.info("Изменение статуса заявок на участие в событии текущего пользователя");
+        return requestService.updateParticipationRequestsStatus(userId, eventId, update);
     }
 }
