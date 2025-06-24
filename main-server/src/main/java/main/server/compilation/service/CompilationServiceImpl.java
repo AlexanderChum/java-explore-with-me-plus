@@ -35,8 +35,8 @@ public class CompilationServiceImpl implements CompilationService {
     @Transactional
     @Override
     public CompilationDto addCompilation(NewCompilationDto newCompilationDto) {
-        Compilation compilation = compilationMapper.toEntity(newCompilationDto);
-
+        CompilationMapper.MapperContext context = new CompilationMapper.MapperContext(eventRepository);
+        Compilation compilation = compilationMapper.toEntity(newCompilationDto, context);
         if (newCompilationDto.getEvents() != null && !newCompilationDto.getEvents().isEmpty()) {
             Set<EventModel> events = new HashSet<>(eventRepository.findAllById(newCompilationDto.getEvents()));
             compilation.setEvents(events);
@@ -60,7 +60,6 @@ public class CompilationServiceImpl implements CompilationService {
     public CompilationDto updateCompilation(Long compId, CompilationUpdateDto updateDto) {
         Compilation compilation = compilationRepository.findById(compId)
                 .orElseThrow(() -> new NotFoundException("Событие с id " + compId + " не найдено"));
-
         if (updateDto.getTitle() != null) {
             compilation.setTitle(updateDto.getTitle());
         }
