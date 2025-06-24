@@ -47,7 +47,7 @@ public class ErrorHandler {
 
     @ExceptionHandler(ConflictException.class)
     @ResponseStatus(HttpStatus.CONFLICT)
-    public ApiError ExceptionHandle(Exception e) {
+    public ApiError exceptionHandle(Exception e) {
         return ApiError.builder()
                 .status(HttpStatus.CONFLICT)
                 .reason("Нарушено ограничение целостности")
@@ -58,7 +58,7 @@ public class ErrorHandler {
 
     @ExceptionHandler(BadRequestException.class)
     @ResponseStatus(HttpStatus.BAD_REQUEST)
-    public ApiError BadRequestExceptionHandle(Exception e) {
+    public ApiError badRequestExceptionHandle(Exception e) {
         return ApiError.builder()
                 .status(HttpStatus.BAD_REQUEST)
                 .reason("Некорректный запрос")

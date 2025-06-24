@@ -87,7 +87,7 @@ public class RequestServiceImpl implements RequestService {
         validateUserExist(initiatorId);
         EventModel event = validateEventExist(eventId);
 
-        if(!event.getInitiator().getId().equals(initiatorId)) {
+        if (!event.getInitiator().getId().equals(initiatorId)) {
             throw new ConflictException("Только инициатор события может менять статус запроса на участие в событии");
         }
 

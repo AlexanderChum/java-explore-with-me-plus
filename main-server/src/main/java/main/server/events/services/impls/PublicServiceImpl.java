@@ -36,7 +36,7 @@ public class PublicServiceImpl {
         return null;
     }
 
-    public EventShortDto getEventById (Long eventId, HttpServletRequest request) {
+    public EventShortDto getEventById(Long eventId, HttpServletRequest request) {
         StatsService.addView(request);
 
         EventModel event = eventRepository.findById(eventId)
