@@ -8,7 +8,7 @@ import lombok.RequiredArgsConstructor;
 import lombok.experimental.FieldDefaults;
 import lombok.extern.slf4j.Slf4j;
 import main.server.events.dto.EventAdminParams;
-import main.server.events.dto.EventShortDto;
+import main.server.events.dto.EventFullDto;
 import main.server.events.dto.UpdateEventAdminRequest;
 import main.server.events.services.AdminService;
 import org.springframework.format.annotation.DateTimeFormat;
@@ -32,14 +32,14 @@ public class AdminController {
     AdminService adminService;
 
     @PatchMapping("/{eventId}")
-    public EventShortDto updateEvent(@Valid @RequestBody UpdateEventAdminRequest updateEventAdminRequest,
-                                     @PathVariable @Positive Long eventId) {
+    public EventFullDto updateEvent(@Valid @RequestBody UpdateEventAdminRequest updateEventAdminRequest,
+                                    @PathVariable @Positive Long eventId) {
         log.info("Получен запрос на обновление события у админа");
         return adminService.updateEvent(updateEventAdminRequest, eventId);
     }
 
     @GetMapping
-    public List<EventShortDto> getEvents(@RequestParam(required = false) List<Long> users,
+    public List<EventFullDto> getEvents(@RequestParam(required = false) List<Long> users,
                                          @RequestParam(required = false) List<String> states,
                                          @RequestParam(required = false) List<Long> categories,
 
