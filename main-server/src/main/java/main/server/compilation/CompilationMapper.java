@@ -30,13 +30,14 @@ public interface CompilationMapper {
     List<CompilationDto> toDtoList(List<Compilation> compilations);
 
     ///////// далее эксперимент, так как есть проблема при маппинге Set<Long> в Set<EventModel>, не компилировалось
-    default Set<EventModel> map(Set<Long> eventIds) {
+    default Set<EventModel> map(Set<Long> eventIds, EventRepository eventRepository) {
         return eventIds.stream()
-                .map(this::mapToEventModel)
+                .map(eventId -> mapToEventModel(eventId, eventRepository)) // передаем eventRepository
                 .collect(Collectors.toSet());
     }
 
-    default EventModel mapToEventModel(Long eventId) {
+    // Также обновим метод для принятия eventRepository
+    default EventModel mapToEventModel(Long eventId, EventRepository eventRepository) {
         return eventRepository.findById(eventId).orElse(null); // либо выбросить исключение
     }
 }
