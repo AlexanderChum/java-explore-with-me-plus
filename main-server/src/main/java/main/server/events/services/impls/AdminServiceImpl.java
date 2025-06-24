@@ -1,6 +1,5 @@
 package main.server.events.services.impls;
 
-import jakarta.persistence.EntityNotFoundException;
 import jakarta.servlet.http.HttpServletRequest;
 import lombok.AccessLevel;
 import lombok.RequiredArgsConstructor;
@@ -16,6 +15,7 @@ import main.server.events.mapper.EventMapper;
 import main.server.events.model.EventModel;
 import main.server.events.repository.EventRepository;
 import main.server.exception.ConflictException;
+import main.server.exception.NotFoundException;
 import main.server.location.LocationMapper;
 import main.server.statserver.StatsService;
 import org.springframework.stereotype.Service;
@@ -46,7 +46,7 @@ public class AdminServiceImpl {
 
     public EventFullDto updateEvent(UpdateEventAdminRequest updateRequest, Long eventId) {
         EventModel event = eventRepository.findById(eventId)
-                .orElseThrow(() -> new EntityNotFoundException("Событие не найдено"));
+                .orElseThrow(() -> new NotFoundException("Событие не найдено"));
 
         validateEventState(event, updateRequest.getState());
         changeEventState(event, updateRequest.getState());
@@ -97,7 +97,7 @@ public class AdminServiceImpl {
 
         if (updateRequest.getCategory() != null) {
             Category category = categoryRepository.findById(updateRequest.getCategory())
-                    .orElseThrow(() -> new EntityNotFoundException("Категория не найдена"));
+                    .orElseThrow(() -> new NotFoundException("Категория не найдена"));
             event.setCategory(category);
         }
 
