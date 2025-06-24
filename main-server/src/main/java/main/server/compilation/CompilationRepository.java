@@ -15,5 +15,5 @@ public interface CompilationRepository extends JpaRepository<Compilation, Long>,
         QuerydslPredicateExecutor<Compilation> {
     @Override
     @NonNull
-    Page<Compilation> findAll( @NonNull Predicate predicate, @NonNull Pageable pageable);
+    Page<Compilation> findAll(@NonNull Predicate predicate, @NonNull Pageable pageable);
 }
