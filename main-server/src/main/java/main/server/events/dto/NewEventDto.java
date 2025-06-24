@@ -45,7 +45,7 @@ public class NewEventDto {
     Boolean paid;
 
     @PositiveOrZero(message = "Лимит участников должен быть положительным или равен нулю.")
-    Long participantsLimit;
+    Long participantLimit;
 
     Boolean requestModeration;
 
