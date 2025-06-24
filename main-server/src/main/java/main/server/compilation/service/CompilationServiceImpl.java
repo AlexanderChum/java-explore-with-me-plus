@@ -9,6 +9,7 @@ import main.server.compilation.dto.CompilationDto;
 import main.server.compilation.dto.CompilationUpdateDto;
 import main.server.compilation.dto.CompilationsRequest;
 import main.server.compilation.model.Compilation;
+import main.server.compilation.model.QCompilation;
 import main.server.compilation.pagination.PaginationOffset;
 import main.server.events.model.EventModel;
 import main.server.events.repository.EventRepository;
@@ -85,6 +86,7 @@ public class CompilationServiceImpl implements CompilationService {
     @Transactional(readOnly = true)
     @Override
     public List<CompilationDto> getCompilations(CompilationsRequest request, PaginationOffset pagination) {
+        QCompilation qCompilation = QCompilation.compilation;
         Predicate predicate = null;
         if (request.getPinned() != null) {
             predicate = qCompilation.pinned.eq(request.getPinned());
