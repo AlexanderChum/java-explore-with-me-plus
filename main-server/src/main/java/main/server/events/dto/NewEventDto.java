@@ -42,12 +42,15 @@ public class NewEventDto {
     @Future(message = "Поле eventDate должно быть в будущем")
     LocalDateTime eventDate;
 
-    Boolean paid;
+    @Builder.Default
+    Boolean paid = false;
 
     @PositiveOrZero(message = "Лимит участников должен быть положительным или равен нулю.")
-    Long participantLimit;
+    @Builder.Default
+    Long participantLimit = 0L;
 
-    Boolean requestModeration;
+    @Builder.Default
+    Boolean requestModeration = true;
 
     @Size(min = 3, max = 120, message = "Поле title должно быть от 3 до 120 символов")
     @NotBlank(message = "Поле title не может быть пустым")
