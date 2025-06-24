@@ -3,9 +3,9 @@ package main.server.compilation;
 import main.server.compilation.dto.CompilationDto;
 import main.server.compilation.dto.NewCompilationDto;
 import main.server.compilation.model.Compilation;
+import main.server.events.mapper.EventMapper;
 import org.mapstruct.Mapper;
 import org.mapstruct.Mapping;
-import org.mapstruct.factory.Mappers;
 
 import java.util.List;
 

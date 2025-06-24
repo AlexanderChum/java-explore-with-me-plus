@@ -28,7 +28,7 @@ public class UpdateEventUserRequest {
     @Size(min = 20, max = 2000)
     String annotation;
 
-    CategoryDto category;
+    Long category;
 
     @Size(min = 20, max = 7000)
     String description;

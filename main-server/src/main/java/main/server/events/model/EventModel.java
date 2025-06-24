@@ -78,8 +78,6 @@ public class EventModel {
     @Column(name = "title")
     String title;
 
-    Long views; //как-то надо с сервера статистики это брать, видимо
-
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "location_id")
     Location location;

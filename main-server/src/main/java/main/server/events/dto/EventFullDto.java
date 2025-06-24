@@ -7,7 +7,7 @@ import lombok.experimental.FieldDefaults;
 import main.server.category.dto.CategoryDto;
 import main.server.events.enums.EventState;
 import main.server.location.LocationDto;
-import main.server.user.dto.UserDto;
+import main.server.user.dto.UserShortDto;
 
 import java.time.LocalDateTime;
 
@@ -35,7 +35,7 @@ public class EventFullDto {
     @JsonFormat(pattern = DATE_TIME_FORMAT)
     LocalDateTime eventDate;
 
-    UserDto initiator;
+    UserShortDto initiator;
 
     @JsonProperty("location")
     LocationDto locationDto;
