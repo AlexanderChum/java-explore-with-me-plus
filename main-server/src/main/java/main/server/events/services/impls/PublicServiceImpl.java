@@ -33,11 +33,12 @@ public class PublicServiceImpl implements PublicService {
     private final EventRepository eventRepository;
     private final EventMapper eventMapper;
     private final JPAQueryFactory jpaQueryFactory;
-    RequestRepository requestRepository;
+    private final RequestRepository requestRepository;
+    private final StatsService statsService;
 
     public List<EventShortDto> getEventsWithFilters(EventPublicParams eventParams, HttpServletRequest request) {
         // Фиксируем обращение к эндпоинту
-        StatsService.addView(request);
+        statsService.addView(request);
 
         QEventModel event = QEventModel.eventModel;
         JPAQuery<EventModel> query = jpaQueryFactory.selectFrom(event)
@@ -92,7 +93,7 @@ public class PublicServiceImpl implements PublicService {
                 .collect(Collectors.toList());
 
         // Получаем просмотры для всех событий за один вызов
-        Map<Long, Long> viewsMap = StatsService.getAmountForEvents(events);
+        Map<Long, Long> viewsMap = statsService.getAmountForEvents(events);
 
         // Если сортировка по просмотрам, сортируем в памяти
         if (eventParams.getSortOptions() != null && eventParams.getSortOptions() == SortOptions.VIEWS) {
@@ -121,12 +122,12 @@ public class PublicServiceImpl implements PublicService {
     }
 
     public EventShortDto getEventById(Long eventId, HttpServletRequest request) {
-        StatsService.addView(request);
+        statsService.addView(request);
 
         EventModel event = eventRepository.findById(eventId)
                 .orElseThrow(() -> new NotFoundException(String.format("Событие с id= %d не было найдено",eventId)));
 
-        Long views = StatsService.getAmount(eventId, event.getCreatedOn(), LocalDateTime.now());
+        Long views = statsService.getAmount(eventId, event.getCreatedOn(), LocalDateTime.now());
 
         EventShortDto result = eventMapper.toShortDto(event);
         result.setViews(views);

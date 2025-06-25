@@ -2,21 +2,25 @@ package main.server.statserver;
 
 import com.google.gson.Gson;
 import jakarta.servlet.http.HttpServletRequest;
-import lombok.experimental.UtilityClass;
 import lombok.extern.slf4j.Slf4j;
 import main.server.events.model.EventModel;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.HttpEntity;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpMethod;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
+import org.springframework.stereotype.Service;
+import org.springframework.web.client.RestClientException;
 import org.springframework.web.client.RestTemplate;
 import org.springframework.web.util.UriComponentsBuilder;
 
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.Arrays;
+import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
@@ -24,105 +28,179 @@ import java.util.stream.Collectors;
 import static stat.constant.Const.DATE_TIME_FORMAT;
 
 @Slf4j
-@UtilityClass
+@Service
 public class StatsService {
     private static final String APP_NAME = "main_svc";
-    private static final String STATS_SERVICE_SCHEME = "http";
-    private static final String STATS_SERVICE_HOST = "stat-server";
-    private static final Integer STATS_SERVICE_PORT = 9090;
-    private final RestTemplate restTemplate = new RestTemplate();
+    
+    @Value("${stats.service.enabled:true}")
+    private boolean statsServiceEnabled;
+    
+    @Value("${stats.service.scheme:http}")
+    private String statsServiceScheme;
+    
+    @Value("${stats.service.host:stat-server}")
+    private String statsServiceHost;
+    
+    @Value("${stats.service.port:9090}")
+    private Integer statsServicePort;
+    
+    private final RestTemplate restTemplate;
+
+    @Autowired
+    public StatsService(RestTemplate restTemplate) {
+        this.restTemplate = restTemplate;
+    }
 
     public void addView(HttpServletRequest request) {
-        log.info("Отправка запроса в сервис статистики");
-        final String url = UriComponentsBuilder.newInstance()
-                .scheme(STATS_SERVICE_SCHEME)
-                .host(STATS_SERVICE_HOST)
-                .port(STATS_SERVICE_PORT)
-                .path("/hit")
-                .toUriString();
+        try {
+            log.info("Отправка запроса в сервис статистики для URI: {}", request.getRequestURI());
+            final String url = UriComponentsBuilder.newInstance()
+                    .scheme(statsServiceScheme)
+                    .host(statsServiceHost)
+                    .port(statsServicePort)
+                    .path("/hit")
+                    .toUriString();
 
-        final ViewDto viewDto = ViewDto.builder()
-                .app(APP_NAME)
-                .uri(request.getRequestURI())
-                .ip(request.getRemoteAddr())
-                .timestamp(LocalDateTime.now().format(DateTimeFormatter.ofPattern(DATE_TIME_FORMAT)))
-                .build();
+            log.debug("URL для отправки статистики: {}", url);
 
-        final HttpMethod method = HttpMethod.POST;
-        final HttpHeaders headers = new HttpHeaders();
-        headers.setContentType(MediaType.APPLICATION_JSON);
-        headers.setAccept(List.of(MediaType.APPLICATION_JSON));
-        final HttpEntity<Object> requestBody = new HttpEntity<>(viewDto, headers);
+            final ViewDto viewDto = ViewDto.builder()
+                    .app(APP_NAME)
+                    .uri(request.getRequestURI())
+                    .ip(request.getRemoteAddr())
+                    .timestamp(LocalDateTime.now())
+                    .build();
 
-        ResponseEntity<Object> response = restTemplate.exchange(url, method, requestBody, Object.class);
+            log.debug("Отправляемые данные: {}", viewDto);
 
-        if (response.getStatusCode() == HttpStatus.CREATED) {
-            log.info("Просмотр события сохранен");
-        } else {
-            log.error("Ошибка при сохранении просмотра");
+            final HttpMethod method = HttpMethod.POST;
+            final HttpHeaders headers = new HttpHeaders();
+            headers.setContentType(MediaType.APPLICATION_JSON);
+            headers.setAccept(List.of(MediaType.APPLICATION_JSON));
+            final HttpEntity<Object> requestBody = new HttpEntity<>(viewDto, headers);
+
+            ResponseEntity<Object> response = restTemplate.exchange(url, method, requestBody, Object.class);
+
+            if (response.getStatusCode() == HttpStatus.CREATED) {
+                log.info("Просмотр события сохранен успешно");
+            } else {
+                log.error("Ошибка при сохранении просмотра: {}", response.getStatusCode());
+            }
+        } catch (RestClientException e) {
+            log.error("Ошибка при отправке запроса в сервис статистики: {}", e.getMessage());
+            log.debug("Детали ошибки:", e);
+        } catch (Exception e) {
+            log.error("Неожиданная ошибка при сохранении просмотра: {}", e.getMessage());
+            log.debug("Детали ошибки:", e);
         }
     }
 
     public Long getAmount(Long eventId, LocalDateTime start, LocalDateTime end) {
-        final List<String> uris = List.of("/events/" + eventId);
-        final String url = UriComponentsBuilder.newInstance()
-                .scheme(STATS_SERVICE_SCHEME)
-                .host(STATS_SERVICE_HOST)
-                .port(STATS_SERVICE_PORT)
-                .path("/stats")
-                .queryParam("start", start.format(DateTimeFormatter.ofPattern(DATE_TIME_FORMAT)))
-                .queryParam("end", end.format(DateTimeFormatter.ofPattern(DATE_TIME_FORMAT)))
-                .queryParam("uris", uris)
-                .queryParam("unique", "true")
-                .toUriString();
+        try {
+            final List<String> uris = List.of("/events/" + eventId);
+            final String url = UriComponentsBuilder.newInstance()
+                    .scheme(statsServiceScheme)
+                    .host(statsServiceHost)
+                    .port(statsServicePort)
+                    .path("/stats")
+                    .queryParam("start", start.format(DateTimeFormatter.ofPattern(DATE_TIME_FORMAT)))
+                    .queryParam("end", end.format(DateTimeFormatter.ofPattern(DATE_TIME_FORMAT)))
+                    .queryParam("uris", uris)
+                    .queryParam("unique", "true")
+                    .toUriString();
 
-        final HttpMethod method = HttpMethod.GET;
-        final HttpHeaders headers = new HttpHeaders();
-        headers.setContentType(MediaType.APPLICATION_JSON);
-        headers.setAccept(List.of(MediaType.APPLICATION_JSON));
-        final HttpEntity<Object> requestBody = new HttpEntity<>(null, headers);
+            log.debug("Запрос статистики для события {}: {}", eventId, url);
 
-        final ResponseEntity<String> response = restTemplate.exchange(url, method, requestBody, String.class);
+            final HttpMethod method = HttpMethod.GET;
+            final HttpHeaders headers = new HttpHeaders();
+            headers.setContentType(MediaType.APPLICATION_JSON);
+            headers.setAccept(List.of(MediaType.APPLICATION_JSON));
+            final HttpEntity<Object> requestBody = new HttpEntity<>(null, headers);
 
-        long viewsAmount = 0L;
+            final ResponseEntity<String> response = restTemplate.exchange(url, method, requestBody, String.class);
 
-        if (response.getStatusCode() != HttpStatus.OK) return viewsAmount;
+            long viewsAmount = 0L;
 
-        StatsDto[] responses = new Gson().fromJson(response.getBody(), StatsDto[].class);
-        viewsAmount = Arrays.stream(responses)
-                .mapToLong(StatsDto::getHits)
-                .sum();
+            if (response.getStatusCode() != HttpStatus.OK || response.getBody() == null) {
+                log.warn("Не удалось получить статистику для события {}: {}", eventId, response.getStatusCode());
+                return viewsAmount;
+            }
 
-        return viewsAmount;
+            StatsDto[] responses = new Gson().fromJson(response.getBody(), StatsDto[].class);
+            if (responses != null) {
+                viewsAmount = Arrays.stream(responses)
+                        .mapToLong(StatsDto::getHits)
+                        .sum();
+            }
+
+            log.debug("Получено {} просмотров для события {}", viewsAmount, eventId);
+            return viewsAmount;
+        } catch (RestClientException e) {
+            log.error("Ошибка при получении статистики для события {}: {}", eventId, e.getMessage());
+            return 0L;
+        } catch (Exception e) {
+            log.error("Неожиданная ошибка при получении статистики для события {}: {}", eventId, e.getMessage());
+            return 0L;
+        }
     }
 
     public Map<Long, Long> getAmountForEvents(List<EventModel> events) {
-        List<String> uris = events.stream()
-                .map(event -> "/events/" + event.getId())
-                .toList();
+        if (events == null || events.isEmpty()) {
+            return Collections.emptyMap();
+        }
 
-        LocalDateTime minDate = events.stream()
-                .map(EventModel::getCreatedOn)
-                .min(LocalDateTime::compareTo)
-                .orElse(LocalDateTime.now()); //на всякий случай оставлю тут комментарий о возможной проблеме со часами
+        try {
+            List<String> uris = events.stream()
+                    .map(event -> "/events/" + event.getId())
+                    .toList();
 
-        String url = UriComponentsBuilder.newInstance()
-                .scheme("http")
-                .host("stat-server")
-                .port(9090)
-                .path("/stats")
-                .queryParam("start", minDate.format(DateTimeFormatter.ofPattern(DATE_TIME_FORMAT)))
-                .queryParam("end", LocalDateTime.now().format(DateTimeFormatter.ofPattern(DATE_TIME_FORMAT)))
-                .queryParam("uris", uris)
-                .queryParam("unique", "true")
-                .toUriString();
+            LocalDateTime minDate = events.stream()
+                    .map(EventModel::getCreatedOn)
+                    .min(LocalDateTime::compareTo)
+                    .orElse(LocalDateTime.now().minusDays(1));
 
-        ResponseEntity<StatsDto[]> response = restTemplate.getForEntity(url, StatsDto[].class);
+            String url = UriComponentsBuilder.newInstance()
+                    .scheme(statsServiceScheme)
+                    .host(statsServiceHost)
+                    .port(statsServicePort)
+                    .path("/stats")
+                    .queryParam("start", minDate.format(DateTimeFormatter.ofPattern(DATE_TIME_FORMAT)))
+                    .queryParam("end", LocalDateTime.now().format(DateTimeFormatter.ofPattern(DATE_TIME_FORMAT)))
+                    .queryParam("uris", uris)
+                    .queryParam("unique", "true")
+                    .toUriString();
 
-        return Arrays.stream(response.getBody())
-                .collect(Collectors.toMap(
-                        dto -> Long.parseLong(dto.getUri().split("/")[2]), //либо 1, если получаем обратно uri вида event/123
-                        StatsDto::getHits
-                ));
+            log.debug("Запрос статистики для {} событий: {}", events.size(), url);
+
+            ResponseEntity<StatsDto[]> response = restTemplate.getForEntity(url, StatsDto[].class);
+
+            if (response.getBody() == null) {
+                log.warn("Получен пустой ответ от сервиса статистики");
+                return Collections.emptyMap();
+            }
+
+            Map<Long, Long> result = Arrays.stream(response.getBody())
+                    .filter(dto -> dto.getUri() != null && dto.getUri().split("/").length >= 3)
+                    .collect(Collectors.toMap(
+                            dto -> {
+                                try {
+                                    return Long.parseLong(dto.getUri().split("/")[2]);
+                                } catch (NumberFormatException e) {
+                                    log.error("Не удалось распарсить ID события из URI: {}", dto.getUri());
+                                    return -1L;
+                                }
+                            },
+                            StatsDto::getHits,
+                            (existing, replacement) -> existing
+                    ));
+
+            log.debug("Получена статистика для {} событий", result.size());
+            return result;
+        } catch (RestClientException e) {
+            log.error("Ошибка при получении статистики для событий: {}", e.getMessage());
+            return Collections.emptyMap();
+        } catch (Exception e) {
+            log.error("Неожиданная ошибка при получении статистики для событий: {}", e.getMessage());
+            return Collections.emptyMap();
+        }
     }
 }

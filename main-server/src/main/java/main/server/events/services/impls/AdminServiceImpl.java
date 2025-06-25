@@ -40,9 +40,10 @@ public class AdminServiceImpl implements AdminService {
     LocationMapper locationMapper;
     JPAQueryFactory jpaQueryFactory;
     RequestRepository requestRepository;
+    StatsService statsService;
 
     public List<EventFullDto> getEventsWithAdminFilters(EventAdminParams eventParams, HttpServletRequest request) {
-        //  StatsService.addView(request);
+        //  statsService.addView(request);
 
         QEventModel event = QEventModel.eventModel;
         JPAQuery<EventModel> query = jpaQueryFactory.selectFrom(event);
@@ -75,7 +76,7 @@ public class AdminServiceImpl implements AdminService {
 
         List<EventModel> events = query.fetch();
 
-        Map<Long, Long> views = StatsService.getAmountForEvents(events);
+        Map<Long, Long> views = statsService.getAmountForEvents(events);
 
         return events.stream()
                 .map(e -> {
@@ -98,7 +99,7 @@ public class AdminServiceImpl implements AdminService {
         EventModel updatedEvent = eventRepository.save(event);
 
         EventFullDto result = eventMapper.toFullDto(updatedEvent);
-        result.setViews(StatsService.getAmount(
+        result.setViews(statsService.getAmount(
                 eventId,
                 updatedEvent.getCreatedOn(),
                 LocalDateTime.now()

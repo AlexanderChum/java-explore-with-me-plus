@@ -47,6 +47,7 @@ public class PrivateServiceImpl implements PrivateService {
     CategoryRepository categoryRepository;
     LocationRepository locationRepository;
     LocationMapper locationMapper;
+    StatsService statsService;
 
     @Transactional
     public EventFullDto createEvent(NewEventDto newEvent, Long userId) {
@@ -80,7 +81,7 @@ public class PrivateServiceImpl implements PrivateService {
 
         EventModel updatedEvent = eventRepository.save(event);
         EventFullDto result = eventMapper.toFullDto(updatedEvent);
-        result.setViews(StatsService.getAmount(
+        result.setViews(statsService.getAmount(
                 eventId,
                 updatedEvent.getCreatedOn(),
                 LocalDateTime.now()
@@ -91,14 +92,14 @@ public class PrivateServiceImpl implements PrivateService {
     @Transactional(readOnly = true)
     public List<EventShortDto> getUserEvents(Long userId, Integer from, Integer size, HttpServletRequest request) {
         userExistence(userId);
-        StatsService.addView(request);
+        statsService.addView(request);
 
         Page<EventModel> events = eventRepository.findByInitiatorId(
                 userId,
                 PageRequest.of(from / size, size, Sort.by("eventDate").descending())
         );
 
-        Map<Long, Long> views = StatsService.getAmountForEvents(events.getContent());
+        Map<Long, Long> views = statsService.getAmountForEvents(events.getContent());
         return events.getContent().stream()
                 .map(event -> {
                     EventShortDto dto = eventMapper.toShortDto(event);
@@ -116,9 +117,9 @@ public class PrivateServiceImpl implements PrivateService {
                                        "у пользователя с id= %d не найдено", eventId, userId)));
 
 
-        StatsService.addView(request);
+        statsService.addView(request);
         EventFullDto result = eventMapper.toFullDto(event);
-        result.setViews(StatsService.getAmount(
+        result.setViews(statsService.getAmount(
                 eventId,
                 event.getCreatedOn(),
                 LocalDateTime.now()
