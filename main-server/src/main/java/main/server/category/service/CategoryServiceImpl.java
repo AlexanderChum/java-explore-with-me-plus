@@ -49,7 +49,7 @@ public class CategoryServiceImpl implements CategoryService {
     public CategoryDto updateCategory(Long catId, CategoryDto categoryDto) {
         Category category = categoryRepository.findById(catId)
                 .orElseThrow(() -> new NotFoundException("Категория с id " + catId + " не найдена"));
-        if(!category.getName().equals(categoryDto.getName())) {
+        if (!category.getName().equals(categoryDto.getName())) {
             validateNameExist(categoryDto.getName());
         }
         mapper.updateCategoryFromDto(categoryDto, category);
