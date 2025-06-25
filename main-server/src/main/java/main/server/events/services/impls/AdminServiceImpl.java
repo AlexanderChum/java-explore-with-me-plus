@@ -24,7 +24,6 @@ import main.server.statserver.StatsService;
 import org.springframework.stereotype.Service;
 import com.querydsl.jpa.impl.JPAQuery;
 import main.server.events.model.QEventModel;
-import jakarta.persistence.EntityManager;
 
 import java.time.LocalDateTime;
 import java.util.List;

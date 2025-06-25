@@ -27,6 +27,7 @@ public interface EventMapper {
 
     // фиксируем первоначальные поля
     @Mapping(target = "state",             constant = "PENDING")
+    @Mapping(target = "confirmedRequests", constant = "0L")
     @Mapping(target = "createdOn",         expression = "java(java.time.LocalDateTime.now())")
     @Mapping(target = "publishedOn",       ignore = true)
 
