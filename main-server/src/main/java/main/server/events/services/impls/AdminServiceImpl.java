@@ -75,16 +75,9 @@ public class AdminServiceImpl implements AdminService {
 
         List<EventModel> events = query.fetch();
 
-        Map<Long, Long> views = StatsService.getAmountForEvents(
-                events);
+        Map<Long, Long> views = StatsService.getAmountForEvents(events);
 
-
-      /*
-        Map<Long, Long> confirmedRequests = requestRepository.getConfirmedRequestCounts(
-                events.stream().map(EventModel::getId).collect(Collectors.toList())
-        );*/
-
-        List<EventFullDto> eventDtos = events.stream()
+        return events.stream()
                 .map(e -> {
                     EventFullDto result = eventMapper.toFullDto(e);
                     Long viewsCount = views.get(e.getId());
@@ -92,7 +85,6 @@ public class AdminServiceImpl implements AdminService {
                     return result;
                 })
                 .collect(Collectors.toList());
-        return eventDtos;
     }
 
     public EventFullDto updateEvent(UpdateEventAdminRequest updateRequest, Long eventId) {
