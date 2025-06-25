@@ -1,5 +1,6 @@
 package main.server.events.services.impls;
 
+import com.querydsl.jpa.impl.JPAQueryFactory;
 import jakarta.servlet.http.HttpServletRequest;
 import lombok.AccessLevel;
 import lombok.RequiredArgsConstructor;
@@ -18,11 +19,17 @@ import main.server.events.services.AdminService;
 import main.server.exception.ConflictException;
 import main.server.exception.NotFoundException;
 import main.server.location.LocationMapper;
+import main.server.request.RequestRepository;
 import main.server.statserver.StatsService;
 import org.springframework.stereotype.Service;
+import com.querydsl.jpa.impl.JPAQuery;
+import main.server.events.model.QEventModel;
+import jakarta.persistence.EntityManager;
 
 import java.time.LocalDateTime;
 import java.util.List;
+import java.util.Map;
+import java.util.stream.Collectors;
 
 @Service
 @RequiredArgsConstructor
@@ -32,17 +39,76 @@ public class AdminServiceImpl implements AdminService {
     EventRepository eventRepository;
     CategoryRepository categoryRepository;
     LocationMapper locationMapper;
+    JPAQueryFactory jpaQueryFactory;
+    RequestRepository requestRepository;
 
     public List<EventFullDto> getEventsWithAdminFilters(EventAdminParams eventParams, HttpServletRequest request) {
-        /*StatsService.addView(request);
+        // Фиксируем факт обращения к эндпоинту
+        //  StatsService.addView(request);
 
-        //снова спроси у Андрея, аналогичный метод, с другими параметрами, возможно можно сделать одним запросным методом в репозиторий
+        // Получаем Q-класс события
+        QEventModel event = QEventModel.eventModel;
 
-        StatsService.getAmountForEvents(//сюда список вытащенных событий
-                );
+        // Строим динамический запрос
+        JPAQuery<EventModel> query = jpaQueryFactory.selectFrom(event);
 
-         */
-        return null;
+        // Добавляем условия фильтрации
+        if (eventParams.getUsers() != null && !eventParams.getUsers().isEmpty()) {
+            query.where(event.initiator.id.in(eventParams.getUsers()));
+        }
+
+        if (eventParams.getStates() != null && !eventParams.getStates().isEmpty()) {
+            List<EventState> states = eventParams.getStates().stream()
+                    .map(EventState::valueOf)
+                    .collect(Collectors.toList());
+            query.where(event.state.in(states));
+        }
+
+        if (eventParams.getCategories() != null && !eventParams.getCategories().isEmpty()) {
+            query.where(event.category.id.in(eventParams.getCategories()));
+        }
+
+        if (eventParams.getRangeStart() != null) {
+            query.where(event.eventDate.after(eventParams.getRangeStart()));
+        }
+
+        if (eventParams.getRangeEnd() != null) {
+            query.where(event.eventDate.before(eventParams.getRangeEnd()));
+        }
+
+        // Добавляем пагинацию
+        query.offset(eventParams.getFrom())
+                .limit(eventParams.getSize());
+
+        // Получаем результат
+        List<EventModel> events = query.fetch();
+
+        // Получаем статистику просмотров для событий
+        Map<Long, Long> views = StatsService.getAmountForEvents(
+                events);
+
+
+      /*  // Получаем количество подтвержденных запросов
+        Map<Long, Long> confirmedRequests = requestRepository.getConfirmedRequestCounts(
+                events.stream().map(EventModel::getId).collect(Collectors.toList())
+        );*/
+
+        // Преобразуем в DTO
+        List<EventFullDto> eventDtos = events.stream()
+                .map(e -> {
+                    // Преобразуем event в EventFullDto
+                    EventFullDto result = eventMapper.toFullDto(e);
+
+                    // Устанавливаем значение views из карты
+                    Long viewsCount = views.get(e.getId()); // Получаем количество просмотров для события по его ID
+                    result.setViews(viewsCount != null ? viewsCount : 0);
+
+                    // Устанавливаем значение views
+                    result.setViews(viewsCount);
+                    return result; // Возвращаем модифицированный объект
+                })
+                .collect(Collectors.toList()); // Собираем в список
+        return eventDtos;
     }
 
     public EventFullDto updateEvent(UpdateEventAdminRequest updateRequest, Long eventId) {
