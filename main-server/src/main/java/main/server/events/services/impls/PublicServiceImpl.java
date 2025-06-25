@@ -124,7 +124,7 @@ public class PublicServiceImpl implements PublicService {
         StatsService.addView(request);
 
         EventModel event = eventRepository.findById(eventId)
-                .orElseThrow(() -> new NotFoundException("Событие не было найдено"));
+                .orElseThrow(() -> new NotFoundException(String.format("Событие с id= %d не было найдено",eventId)));
 
         Long views = StatsService.getAmount(eventId, event.getCreatedOn(), LocalDateTime.now());
 

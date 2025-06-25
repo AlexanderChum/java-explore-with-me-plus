@@ -203,7 +203,9 @@ public class RequestServiceImpl implements RequestService {
 
     private void validateNotExistsByEventIdAndRequesterId(Long eventId, Long requesterId) {
         requestRepository.findByEventIdAndRequesterId(eventId, requesterId)
-                .orElseThrow(() -> new DuplicatedDataException("Нельзя добавить повторный запрос для этого события"));
+                .ifPresent(request -> {
+                    throw new DuplicatedDataException("Нельзя добавить повторный запрос для этого события");
+                });
     }
 
     private ParticipationRequest validateRequestExist(Long requesterId, Long requestId) {

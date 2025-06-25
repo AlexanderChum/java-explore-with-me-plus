@@ -89,7 +89,7 @@ public class AdminServiceImpl implements AdminService {
 
     public EventFullDto updateEvent(UpdateEventAdminRequest updateRequest, Long eventId) {
         EventModel event = eventRepository.findById(eventId)
-                .orElseThrow(() -> new NotFoundException("Событие не найдено"));
+                .orElseThrow(() -> new NotFoundException(String.format("Событие с id= %d не найдено", eventId)));
 
         validateEventState(event, updateRequest.getState());
         changeEventState(event, updateRequest.getState());
@@ -103,6 +103,8 @@ public class AdminServiceImpl implements AdminService {
                 updatedEvent.getCreatedOn(),
                 LocalDateTime.now()
         ));
+
+
         return result;
     }
 

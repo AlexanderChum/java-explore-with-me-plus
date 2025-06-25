@@ -35,7 +35,6 @@ public interface EventMapper {
     @Mapping(target = "category",  source = "category")
     @Mapping(target = "initiator", source = "user")
     @Mapping(target = "location",  source = "location")
-
     EventModel toEntity(NewEventDto dto,
                         Category category,
                         User user,
