@@ -55,12 +55,12 @@ public class PrivateServiceImpl implements PrivateService {
 
         Location location = locationRepository.save(locationMapper.toEntity(newEvent.getLocationDto()));
 
-        EventModel event = eventMapper.toEntity(new NewEventDto());
-        event.setInitiator(user);
+        EventModel event = eventMapper.toEntity(newEvent, category, user, location);
+        /*event.setInitiator(user);
         event.setCategory(category);
         event.setLocation(location);
         event.setState(EventState.PENDING);
-        event.setCreatedOn(LocalDateTime.now());
+        event.setCreatedOn(LocalDateTime.now());*/
 
         return eventMapper.toFullDto(eventRepository.save(event));
     }

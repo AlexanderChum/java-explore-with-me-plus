@@ -22,6 +22,7 @@ import main.server.category.model.Category;
 import main.server.events.enums.EventState;
 import main.server.location.Location;
 import main.server.user.model.User;
+import org.hibernate.annotations.Formula;
 
 import java.time.LocalDateTime;
 
@@ -39,19 +40,21 @@ public class EventModel {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     Long id;
 
-    @Column(name = "annotation")
+    @Column(name = "annotation", length=2000)
     String annotation;
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "category_id")
     Category category;
 
+    @Formula("(select count(*) from participation_request p " +
+             " where p.event_id = id and p.status = 'CONFIRMED')")
     Long confirmedRequests;
 
     @Column(name = "created_on")
     LocalDateTime createdOn;
 
-    @Column(name = "description")
+    @Column(name = "description", length=7000)
     String description;
 
     @Column(name = "event_date")
