@@ -21,7 +21,7 @@ public class ViewDto {
     String app;
     String uri;
     String ip;
-    
+
     @JsonFormat(pattern = DATE_TIME_FORMAT)
     LocalDateTime timestamp;
 }

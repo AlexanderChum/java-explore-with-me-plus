@@ -31,19 +31,19 @@ import static stat.constant.Const.DATE_TIME_FORMAT;
 @Service
 public class StatsService {
     private static final String APP_NAME = "main_svc";
-    
+
     @Value("${stats.service.enabled:true}")
     private boolean statsServiceEnabled;
-    
+
     @Value("${stats.service.scheme:http}")
     private String statsServiceScheme;
-    
+
     @Value("${stats.service.host:stat-server}")
     private String statsServiceHost;
-    
+
     @Value("${stats.service.port:9090}")
     private Integer statsServicePort;
-    
+
     private final RestTemplate restTemplate;
 
     @Autowired
