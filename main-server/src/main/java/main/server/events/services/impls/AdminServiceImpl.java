@@ -42,16 +42,11 @@ public class AdminServiceImpl implements AdminService {
     RequestRepository requestRepository;
 
     public List<EventFullDto> getEventsWithAdminFilters(EventAdminParams eventParams, HttpServletRequest request) {
-        // Фиксируем факт обращения к эндпоинту
         //  StatsService.addView(request);
 
-        // Получаем Q-класс события
         QEventModel event = QEventModel.eventModel;
-
-        // Строим динамический запрос
         JPAQuery<EventModel> query = jpaQueryFactory.selectFrom(event);
 
-        // Добавляем условия фильтрации
         if (eventParams.getUsers() != null && !eventParams.getUsers().isEmpty()) {
             query.where(event.initiator.id.in(eventParams.getUsers()));
         }
@@ -75,39 +70,21 @@ public class AdminServiceImpl implements AdminService {
             query.where(event.eventDate.before(eventParams.getRangeEnd()));
         }
 
-        // Добавляем пагинацию
         query.offset(eventParams.getFrom())
                 .limit(eventParams.getSize());
 
-        // Получаем результат
         List<EventModel> events = query.fetch();
 
-        // Получаем статистику просмотров для событий
-        Map<Long, Long> views = StatsService.getAmountForEvents(
-                events);
+        Map<Long, Long> views = StatsService.getAmountForEvents(events);
 
-
-      /*  // Получаем количество подтвержденных запросов
-        Map<Long, Long> confirmedRequests = requestRepository.getConfirmedRequestCounts(
-                events.stream().map(EventModel::getId).collect(Collectors.toList())
-        );*/
-
-        // Преобразуем в DTO
-        List<EventFullDto> eventDtos = events.stream()
+        return events.stream()
                 .map(e -> {
-                    // Преобразуем event в EventFullDto
                     EventFullDto result = eventMapper.toFullDto(e);
-
-                    // Устанавливаем значение views из карты
-                    Long viewsCount = views.get(e.getId()); // Получаем количество просмотров для события по его ID
+                    Long viewsCount = views.get(e.getId());
                     result.setViews(viewsCount != null ? viewsCount : 0);
-
-                    // Устанавливаем значение views
-                    result.setViews(viewsCount);
-                    return result; // Возвращаем модифицированный объект
+                    return result;
                 })
-                .collect(Collectors.toList()); // Собираем в список
-        return eventDtos;
+                .collect(Collectors.toList());
     }
 
     public EventFullDto updateEvent(UpdateEventAdminRequest updateRequest, Long eventId) {
