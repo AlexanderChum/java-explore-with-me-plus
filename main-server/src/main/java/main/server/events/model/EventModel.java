@@ -40,7 +40,7 @@ public class EventModel {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     Long id;
 
-    @Column(name = "annotation",length=2000)
+    @Column(name = "annotation", length = 2000)
     String annotation;
 
     @ManyToOne(fetch = FetchType.LAZY)
@@ -54,7 +54,7 @@ public class EventModel {
     @Column(name = "created_on")
     LocalDateTime createdOn;
 
-    @Column(name = "description",length=7000)
+    @Column(name = "description", length = 7000)
     String description;
 
     @Column(name = "event_date")
