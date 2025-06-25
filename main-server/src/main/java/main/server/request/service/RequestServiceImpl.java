@@ -22,6 +22,7 @@ import main.server.user.model.User;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.LinkedHashMap;
@@ -182,6 +183,7 @@ public class RequestServiceImpl implements RequestService {
         ParticipationRequest participationRequest = new ParticipationRequest();
         participationRequest.setRequester(requester);
         participationRequest.setEvent(event);
+        participationRequest.setCreated(LocalDateTime.now());
 
         if (!event.getRequestModeration() || event.getParticipantLimit() == 0) {
             participationRequest.setStatus(RequestStatus.CONFIRMED);
