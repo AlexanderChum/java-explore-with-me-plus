@@ -52,6 +52,10 @@ public interface EventMapper {
     @Mapping(target = "views", ignore = true)
     EventShortDto toShortDto(EventModel entity);
 
+    @Mapping(target = "views", expression = "java(views)")
+    @Mapping(target = "confirmedRequests", expression = "java(confirmedRequests)")
+    EventShortDto toShortDto(EventModel entity, Long confirmedRequests, Long views);
+
    /* @Mapping(target = "id", ignore = true)
     @Mapping(target = "state", ignore = true)
     @Mapping(source = "category", target = "category.id")
