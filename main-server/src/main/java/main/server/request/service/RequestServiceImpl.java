@@ -3,6 +3,7 @@ package main.server.request.service;
 import lombok.AccessLevel;
 import lombok.RequiredArgsConstructor;
 import lombok.experimental.FieldDefaults;
+import lombok.extern.slf4j.Slf4j;
 import main.server.events.model.EventModel;
 import main.server.events.enums.EventState;
 import main.server.events.repository.EventRepository;
@@ -35,6 +36,7 @@ import java.util.stream.Collectors;
 @RequiredArgsConstructor
 @Transactional
 @SuppressWarnings("unused")
+@Slf4j
 public class RequestServiceImpl implements RequestService {
     RequestRepository requestRepository;
     RequestMapper requestMapper;
@@ -81,22 +83,25 @@ public class RequestServiceImpl implements RequestService {
                 .map(requestMapper::toParticipationRequestDto).toList();
     }
 
-    @Transactional(readOnly = true)
     @Override
     public EventRequestStatusUpdateResultDto updateParticipationRequestsStatus(Long initiatorId, Long eventId,
                                                                                EventRequestStatusUpdateRequestDto eventRequestStatusUpdateRequestDto) {
+        log.info("Начало обновления статусов запроса на участие для инициатора ID: {}, события ID: {}", initiatorId, eventId);
         validateUserExist(initiatorId);
         EventModel event = validateEventExist(eventId);
 
         if (!event.getInitiator().getId().equals(initiatorId)) {
+            log.error("Попытка изменить статус не инициатором события. Инициатор: {}, Запрос: {}", event.getInitiator().getId(), initiatorId);
             throw new ConflictException("Только инициатор события может менять статус запроса на участие в событии");
         }
 
         long limit = event.getParticipantLimit();
+        log.info("Лимит: {}", limit);
 
         EventRequestStatusUpdateResultDto result = new EventRequestStatusUpdateResultDto();
 
         if (!event.getRequestModeration() || limit == 0) {
+            log.info("Запросы на участие не требуют модерации или лимит участников равен 0.");
             return result;
         }
 
@@ -104,15 +109,18 @@ public class RequestServiceImpl implements RequestService {
         RequestStatus status = eventRequestStatusUpdateRequestDto.getStatus();
 
         if (!status.equals(RequestStatus.REJECTED) && !status.equals(RequestStatus.CONFIRMED)) {
+            log.error("Недопустимый статус запроса: {}", status);
             throw new BadRequestException("Статус должен быть REJECTED или CONFIRMED");
         }
 
         if (requestRepository.countByIdInAndEventId(requestIds, eventId) != requestIds.size()) {
+            log.error("Некоторые запросы не соответствуют событию с ID: {}", eventId);
             throw new ConflictException(String.format("Не все запросы соответствуют событию с id= %d", eventId));
         }
 
         if (requestRepository
                     .countByEventIdAndStatusEquals(eventId, RequestStatus.CONFIRMED) >= limit) {
+            log.error("Достигнут лимит заявок на событие с ID: {}", eventId);
             throw new ConflictException(String.format("Уже достигнут лимит предела заявок на событие с id= %d", eventId));
         }
 
@@ -127,6 +135,7 @@ public class RequestServiceImpl implements RequestService {
                 ));
 
         if (requestsMap.values().stream().anyMatch(request -> request.getStatus() != RequestStatus.PENDING)) {
+            log.error("Некоторые запросы имеют статус, отличный от PENDING");
             throw new ConflictException("У всех запросов должен быть статус: PENDING");
         }
 
@@ -140,13 +149,16 @@ public class RequestServiceImpl implements RequestService {
             if (status == RequestStatus.REJECTED) {
                 request.setStatus(RequestStatus.REJECTED);
                 rejectedRequests.add(requestMapper.toParticipationRequestDto(request));
+                log.info("Заявка ID {} отклонена", request.getId());
             } else {
                 if (confirmedRequests.size() < confirmedCount) {
                     request.setStatus(RequestStatus.CONFIRMED);
                     confirmedRequests.add(requestMapper.toParticipationRequestDto(request));
+                    log.info("Заявка ID {} подтверждена", request.getId());
                 } else {
                     request.setStatus(RequestStatus.REJECTED);
                     rejectedRequests.add(requestMapper.toParticipationRequestDto(request));
+                    log.info("Заявка ID {} отклонена из-за превышения лимита", request.getId());
                 }
             }
         });
@@ -154,9 +166,16 @@ public class RequestServiceImpl implements RequestService {
         result.getConfirmedRequests().addAll(confirmedRequests);
         result.getRejectedRequests().addAll(rejectedRequests);
 
+        log.info("Сохранение статусов запросов");
+
+        requestsMap.values().forEach(request ->
+                log.info("Request ID: {} New Status: {}", request.getId(), request.getStatus())
+        );
+
         requestRepository.saveAll(requestsMap.values());
 
         event.setConfirmedRequests(requestRepository.countByEventIdAndStatusEquals(eventId, RequestStatus.CONFIRMED));
+        log.info("Обновлено ConfirmedRequests для события ID: {}. Новое значение: {}", eventId, event.getConfirmedRequests());
 
         return result;
     }
