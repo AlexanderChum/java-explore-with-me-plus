@@ -13,6 +13,7 @@ import main.server.events.mapper.EventMapper;
 import main.server.events.model.EventModel;
 import main.server.events.repository.EventRepository;
 import main.server.events.services.PublicService;
+import main.server.exception.BadRequestException;
 import main.server.exception.NotFoundException;
 import main.server.request.RequestRepository;
 import main.server.statserver.StatsService;
@@ -39,6 +40,9 @@ public class PublicServiceImpl implements PublicService {
     public List<EventShortDto> getEventsWithFilters(String text, List<Long> categories, Boolean paid,
         LocalDateTime rangeStart, LocalDateTime rangeEnd, Boolean onlyAvailable, String sort, Integer from,
         Integer size, HttpServletRequest request) {
+        if ((rangeStart != null) && (rangeEnd != null) && (rangeStart.isAfter(rangeEnd)))
+            throw new BadRequestException("Время начала на может быть позже окончания");
+
         statsService.addView(request);
 
         List<EventModel> events = eventRepository.findAllByFiltersPublic(text, categories, paid, rangeStart, rangeEnd,
