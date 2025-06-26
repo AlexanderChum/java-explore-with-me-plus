@@ -41,16 +41,16 @@ public class PrivateController {
 
     @GetMapping
     public List<EventShortDto> getUserEvents(@PathVariable
-                                            @Positive
-                                            Long userId,
+                                             @Positive
+                                             Long userId,
 
                                              @RequestParam(defaultValue = "0")
-                                            @PositiveOrZero
-                                            Integer from,
+                                             @PositiveOrZero
+                                             Integer from,
 
                                              @RequestParam(defaultValue = "10")
-                                            @Positive
-                                            Integer size,
+                                             @Positive
+                                             Integer size,
 
                                              HttpServletRequest request) {
         log.info("Получение событий, добавленных текущим пользователем");
@@ -76,7 +76,7 @@ public class PrivateController {
     @PatchMapping("/{eventId}")
     public EventFullDto updateEventByEventId(@PathVariable @Positive Long userId,
                                              @PathVariable @Positive Long eventId,
-                                             @RequestBody UpdateEventUserRequest updateEventDto) {
+                                             @Valid @RequestBody UpdateEventUserRequest updateEventDto) {
         log.info("Изменение события, добавленного текущим пользователем");
         return privateService.updateEventByEventId(updateEventDto, userId, eventId);
     }
