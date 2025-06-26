@@ -2,7 +2,6 @@ package main.server.events.controllers;
 
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.validation.Valid;
-import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Positive;
 import lombok.AccessLevel;
 import lombok.RequiredArgsConstructor;
@@ -47,12 +46,10 @@ public class AdminController {
 
                                         @RequestParam(required = false)
                                         @DateTimeFormat(pattern = DATE_TIME_FORMAT)
-                                        @NotNull
                                         LocalDateTime rangeStart,
 
                                         @RequestParam(required = false)
                                         @DateTimeFormat(pattern = DATE_TIME_FORMAT)
-                                        @NotNull
                                         LocalDateTime rangeEnd,
 
                                         @RequestParam(defaultValue = "0") Integer from,
