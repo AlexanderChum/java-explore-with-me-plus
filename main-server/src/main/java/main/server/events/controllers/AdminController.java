@@ -2,12 +2,12 @@ package main.server.events.controllers;
 
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.validation.Valid;
+import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Positive;
 import lombok.AccessLevel;
 import lombok.RequiredArgsConstructor;
 import lombok.experimental.FieldDefaults;
 import lombok.extern.slf4j.Slf4j;
-import main.server.events.dto.EventAdminParams;
 import main.server.events.dto.EventFullDto;
 import main.server.events.dto.UpdateEventAdminRequest;
 import main.server.events.services.AdminService;
@@ -42,32 +42,24 @@ public class AdminController {
 
     @GetMapping
     public List<EventFullDto> getEvents(@RequestParam(required = false) List<Long> users,
-                                         @RequestParam(required = false) List<String> states,
-                                         @RequestParam(required = false) List<Long> categories,
+                                        @RequestParam(required = false) List<String> states,
+                                        @RequestParam(required = false) List<Long> categories,
 
-                                         @RequestParam(required = false)
-                                         @DateTimeFormat(pattern = DATE_TIME_FORMAT)
-                                         LocalDateTime rangeStart,
+                                        @RequestParam(required = false)
+                                        @DateTimeFormat(pattern = DATE_TIME_FORMAT)
+                                        @NotNull
+                                        LocalDateTime rangeStart,
 
-                                         @RequestParam(required = false)
-                                         @DateTimeFormat(pattern = DATE_TIME_FORMAT)
-                                         LocalDateTime rangeEnd,
+                                        @RequestParam(required = false)
+                                        @DateTimeFormat(pattern = DATE_TIME_FORMAT)
+                                        @NotNull
+                                        LocalDateTime rangeEnd,
 
-                                         @RequestParam(defaultValue = "0") Integer from,
-                                         @RequestParam(defaultValue = "10") Integer size,
-                                         HttpServletRequest request) {
+                                        @RequestParam(defaultValue = "0") Integer from,
+                                        @RequestParam(defaultValue = "10") Integer size,
+                                        HttpServletRequest request) {
         log.info("Поступил запрос на обновление события для админа");
-
-        EventAdminParams eventParams = EventAdminParams.builder()
-                .users(users)
-                .states(states)
-                .categories(categories)
-                .rangeStart(rangeStart)
-                .rangeEnd(rangeEnd)
-                .from(from)
-                .size(size)
-                .build();
-
-        return adminService.getEventsWithAdminFilters(eventParams, request);
+        return adminService.getEventsWithAdminFilters(users, states, categories, rangeStart, rangeEnd,
+                from, size, request);
     }
 }

@@ -7,7 +7,6 @@ import lombok.RequiredArgsConstructor;
 import lombok.experimental.FieldDefaults;
 import main.server.category.model.Category;
 import main.server.category.repository.CategoryRepository;
-import main.server.events.dto.EventAdminParams;
 import main.server.events.dto.EventFullDto;
 import main.server.events.dto.UpdateEventAdminRequest;
 import main.server.events.enums.EventState;
@@ -21,11 +20,11 @@ import main.server.exception.NotFoundException;
 import main.server.location.LocationMapper;
 import main.server.request.RequestRepository;
 import main.server.statserver.StatsService;
+import org.springframework.data.domain.PageRequest;
 import org.springframework.stereotype.Service;
-import com.querydsl.jpa.impl.JPAQuery;
-import main.server.events.model.QEventModel;
 
 import java.time.LocalDateTime;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
@@ -42,50 +41,21 @@ public class AdminServiceImpl implements AdminService {
     RequestRepository requestRepository;
     StatsService statsService;
 
-    public List<EventFullDto> getEventsWithAdminFilters(EventAdminParams eventParams, HttpServletRequest request) {
-        //  statsService.addView(request);
+    public List<EventFullDto> getEventsWithAdminFilters(List<Long> users, List<String> states, List<Long> categories,
+        LocalDateTime rangeStart, LocalDateTime rangeEnd, Integer from, Integer size, HttpServletRequest request) {
+        statsService.addView(request);
 
-        QEventModel event = QEventModel.eventModel;
-        JPAQuery<EventModel> query = jpaQueryFactory.selectFrom(event);
-
-        if (eventParams.getUsers() != null && !eventParams.getUsers().isEmpty()) {
-            query.where(event.initiator.id.in(eventParams.getUsers()));
-        }
-
-        if (eventParams.getStates() != null && !eventParams.getStates().isEmpty()) {
-            List<EventState> states = eventParams.getStates().stream()
-                    .map(EventState::valueOf)
-                    .collect(Collectors.toList());
-            query.where(event.state.in(states));
-        }
-
-        if (eventParams.getCategories() != null && !eventParams.getCategories().isEmpty()) {
-            query.where(event.category.id.in(eventParams.getCategories()));
-        }
-
-        if (eventParams.getRangeStart() != null) {
-            query.where(event.eventDate.after(eventParams.getRangeStart()));
-        }
-
-        if (eventParams.getRangeEnd() != null) {
-            query.where(event.eventDate.before(eventParams.getRangeEnd()));
-        }
-
-        query.offset(eventParams.getFrom())
-                .limit(eventParams.getSize());
-
-        List<EventModel> events = query.fetch();
+        List<EventModel> events = eventRepository.findAllByFiltersAdmin(users, states, categories, rangeStart, rangeEnd,
+                PageRequest.of(from, size));
 
         Map<Long, Long> views = statsService.getAmountForEvents(events);
-
         return events.stream()
-                .map(e -> {
-                    EventFullDto result = eventMapper.toFullDto(e);
-                    Long viewsCount = views.get(e.getId());
-                    result.setViews(viewsCount != null ? viewsCount : 0);
-                    return result;
+                .map(eventModel -> {
+                    EventFullDto eventShort = eventMapper.toFullDto(eventModel);
+                    eventShort.setViews(views.get(eventShort.getId()));
+                    return eventShort;
                 })
-                .collect(Collectors.toList());
+                .collect(Collectors.toCollection(ArrayList::new));
     }
 
     public EventFullDto updateEvent(UpdateEventAdminRequest updateRequest, Long eventId) {

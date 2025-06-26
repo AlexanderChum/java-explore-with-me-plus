@@ -1,13 +1,15 @@
 package main.server.events.services;
 
 import jakarta.servlet.http.HttpServletRequest;
-import main.server.events.dto.EventPublicParams;
 import main.server.events.dto.EventShortDto;
 
+import java.time.LocalDateTime;
 import java.util.List;
 
 public interface PublicService {
-    List<EventShortDto> getEventsWithFilters(EventPublicParams eventParams, HttpServletRequest request);
-
     EventShortDto getEventById(Long eventId, HttpServletRequest request);
+
+    List<EventShortDto> getEventsWithFilters(String text, List<Long> categories, Boolean paid, LocalDateTime rangeStart,
+                                             LocalDateTime rangeEnd, Boolean onlyAvailable, String sort, Integer from,
+                                             Integer size, HttpServletRequest request);
 }
