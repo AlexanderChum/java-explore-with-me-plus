@@ -30,6 +30,7 @@ import java.util.stream.Collectors;
 @Slf4j
 @RequiredArgsConstructor
 @FieldDefaults(level = AccessLevel.PRIVATE, makeFinal = true)
+@SuppressWarnings("unused")
 public class PublicServiceImpl implements PublicService {
     EventRepository eventRepository;
     EventMapper eventMapper;

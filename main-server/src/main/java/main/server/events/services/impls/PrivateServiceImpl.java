@@ -17,6 +17,7 @@ import main.server.events.mapper.EventMapper;
 import main.server.events.model.EventModel;
 import main.server.events.repository.EventRepository;
 import main.server.events.services.PrivateService;
+import main.server.exception.BadRequestException;
 import main.server.exception.ConflictException;
 import main.server.exception.NotFoundException;
 import main.server.location.Location;
@@ -40,6 +41,7 @@ import java.util.stream.Collectors;
 @Slf4j
 @RequiredArgsConstructor
 @FieldDefaults(level = AccessLevel.PRIVATE, makeFinal = true)
+@SuppressWarnings("unused")
 public class PrivateServiceImpl implements PrivateService {
     EventRepository eventRepository;
     EventMapper eventMapper;
@@ -74,6 +76,10 @@ public class PrivateServiceImpl implements PrivateService {
 
         if (event.getState() == EventState.PUBLISHED) {
             throw new ConflictException("Невозможно обновить опубликованное событие");
+        }
+
+        if (update.getEventDate() != null && update.getEventDate().isBefore(LocalDateTime.now())) {
+            throw new BadRequestException("Изменяемая дата не может быть в прошлом");
         }
 
         changeEventState(event, update);

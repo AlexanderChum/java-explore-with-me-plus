@@ -1,6 +1,5 @@
 package main.server.events.services.impls;
 
-import com.querydsl.jpa.impl.JPAQueryFactory;
 import jakarta.servlet.http.HttpServletRequest;
 import lombok.AccessLevel;
 import lombok.RequiredArgsConstructor;
@@ -21,7 +20,6 @@ import main.server.exception.NotFoundException;
 import main.server.location.Location;
 import main.server.location.LocationMapper;
 import main.server.location.LocationRepository;
-import main.server.request.RequestRepository;
 import main.server.statserver.StatsService;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.stereotype.Service;
@@ -35,14 +33,13 @@ import java.util.stream.Collectors;
 @Service
 @RequiredArgsConstructor
 @FieldDefaults(level = AccessLevel.PRIVATE, makeFinal = true)
+@SuppressWarnings("unused")
 public class AdminServiceImpl implements AdminService {
     EventMapper eventMapper;
     EventRepository eventRepository;
     CategoryRepository categoryRepository;
     LocationRepository locationRepository;
     LocationMapper locationMapper;
-    JPAQueryFactory jpaQueryFactory;
-    RequestRepository requestRepository;
     StatsService statsService;
 
     public List<EventFullDto> getEventsWithAdminFilters(List<Long> users, List<String> states, List<Long> categories,
