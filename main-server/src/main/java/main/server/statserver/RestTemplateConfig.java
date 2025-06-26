@@ -15,4 +15,4 @@ public class RestTemplateConfig {
         factory.setReadTimeout(10000);
         return new RestTemplate(factory);
     }
-} 
+}

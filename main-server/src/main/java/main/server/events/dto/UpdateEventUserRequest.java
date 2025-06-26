@@ -2,7 +2,6 @@ package main.server.events.dto;
 
 import com.fasterxml.jackson.annotation.JsonFormat;
 import com.fasterxml.jackson.annotation.JsonProperty;
-import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.PositiveOrZero;
 import jakarta.validation.constraints.Size;
 import lombok.AccessLevel;
@@ -26,13 +25,11 @@ import static stat.constant.Const.DATE_TIME_FORMAT;
 public class UpdateEventUserRequest {
 
     @Size(min = 20, max = 2000, message = "Поле annotation должно быть от 20 до 2000 символов")
-    @NotBlank
     String annotation;
 
     Long category;
 
     @Size(min = 20, max = 7000, message = "Поле description должно быть от 20 до 7000 символов")
-    @NotBlank
     String description;
 
     @JsonFormat(pattern = DATE_TIME_FORMAT)
@@ -49,7 +46,6 @@ public class UpdateEventUserRequest {
     StateAction state;
 
     @Size(min = 3, max = 120, message = "Поле title должно быть от 3 до 120 символов")
-    @NotBlank
     String title;
 
     LocationDto location;
