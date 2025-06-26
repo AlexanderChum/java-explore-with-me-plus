@@ -9,6 +9,7 @@ import lombok.AccessLevel;
 import lombok.RequiredArgsConstructor;
 import lombok.experimental.FieldDefaults;
 import lombok.extern.slf4j.Slf4j;
+import main.server.events.dto.EventFullDto;
 import main.server.events.dto.EventShortDto;
 import main.server.events.services.PublicService;
 import org.springframework.format.annotation.DateTimeFormat;
@@ -66,8 +67,8 @@ public class PublicController {
 
     @GetMapping("/{eventId}")
     @ResponseStatus(HttpStatus.OK)
-    public EventShortDto getEventById(@PathVariable @Positive Long eventId,
-                                      HttpServletRequest request) {
+    public EventFullDto getEventById(@PathVariable @Positive Long eventId,
+                                     HttpServletRequest request) {
         log.info("Поступил запрос на получение события по id от ноунейма");
         return publicService.getEventById(eventId, request);
     }

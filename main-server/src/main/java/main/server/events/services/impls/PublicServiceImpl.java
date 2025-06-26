@@ -6,6 +6,7 @@ import lombok.AccessLevel;
 import lombok.RequiredArgsConstructor;
 import lombok.experimental.FieldDefaults;
 import lombok.extern.slf4j.Slf4j;
+import main.server.events.dto.EventFullDto;
 import main.server.events.dto.EventShortDto;
 import main.server.events.mapper.EventMapper;
 import main.server.events.model.EventModel;
@@ -53,7 +54,7 @@ public class PublicServiceImpl implements PublicService {
                 .collect(Collectors.toCollection(ArrayList::new));
     }
 
-    public EventShortDto getEventById(Long eventId, HttpServletRequest request) {
+    public EventFullDto getEventById(Long eventId, HttpServletRequest request) {
         statsService.addView(request);
 
         EventModel event = eventRepository.findById(eventId)
@@ -61,7 +62,7 @@ public class PublicServiceImpl implements PublicService {
 
         Long views = statsService.getAmount(eventId, event.getCreatedOn(), LocalDateTime.now());
 
-        EventShortDto result = eventMapper.toShortDto(event);
+        EventFullDto result = eventMapper.toFullDto(event);
         result.setViews(views);
 
         return result;

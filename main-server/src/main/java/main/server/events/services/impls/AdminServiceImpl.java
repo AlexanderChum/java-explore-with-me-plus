@@ -17,7 +17,9 @@ import main.server.events.repository.EventRepository;
 import main.server.events.services.AdminService;
 import main.server.exception.ConflictException;
 import main.server.exception.NotFoundException;
+import main.server.location.Location;
 import main.server.location.LocationMapper;
+import main.server.location.LocationRepository;
 import main.server.request.RequestRepository;
 import main.server.statserver.StatsService;
 import org.springframework.data.domain.PageRequest;
@@ -36,6 +38,7 @@ public class AdminServiceImpl implements AdminService {
     EventMapper eventMapper;
     EventRepository eventRepository;
     CategoryRepository categoryRepository;
+    LocationRepository locationRepository;
     LocationMapper locationMapper;
     JPAQueryFactory jpaQueryFactory;
     RequestRepository requestRepository;
@@ -142,7 +145,9 @@ public class AdminServiceImpl implements AdminService {
         }
 
         if (updateRequest.getLocationDto() != null) {
-            event.setLocation(locationMapper.toEntity(updateRequest.getLocationDto()));
+            Location newLocation = locationMapper.toEntity(updateRequest.getLocationDto());
+            locationRepository.save(newLocation);
+            event.setLocation(newLocation);
         }
     }
  }
