@@ -66,6 +66,10 @@ public class AdminServiceImpl implements AdminService {
         EventModel event = eventRepository.findById(eventId)
                 .orElseThrow(() -> new NotFoundException(String.format("Событие с id= %d не найдено", eventId)));
 
+        if (updateRequest.getEventDate() != null && updateRequest.getEventDate().isBefore(LocalDateTime.now())) {
+            throw new BadRequestException("Изменяемая дата не может быть в прошлом");
+        }
+
         validateEventState(event, updateRequest.getState());
         changeEventState(event, updateRequest.getState());
         updateEventFields(event, updateRequest);
