@@ -8,6 +8,7 @@ import lombok.experimental.FieldDefaults;
 import lombok.extern.slf4j.Slf4j;
 import main.server.events.dto.EventFullDto;
 import main.server.events.dto.EventShortDto;
+import main.server.events.enums.EventState;
 import main.server.events.mapper.EventMapper;
 import main.server.events.model.EventModel;
 import main.server.events.repository.EventRepository;
@@ -55,10 +56,14 @@ public class PublicServiceImpl implements PublicService {
     }
 
     public EventFullDto getEventById(Long eventId, HttpServletRequest request) {
-        statsService.addView(request);
-
         EventModel event = eventRepository.findById(eventId)
                 .orElseThrow(() -> new NotFoundException(String.format("Событие с id= %d не было найдено",eventId)));
+
+        if (event.getState() != EventState.PUBLISHED) {
+            throw new NotFoundException(String.format("Событие с id= %d недоступно, так как не опубликовано",eventId));
+        }
+
+        statsService.addView(request);
 
         Long views = statsService.getAmount(eventId, event.getCreatedOn(), LocalDateTime.now());
 
