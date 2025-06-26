@@ -42,19 +42,16 @@ public class PublicController {
 
                                          @RequestParam(required = false)
                                          @DateTimeFormat(pattern = DATE_TIME_FORMAT)
-                                         @NotNull
                                          LocalDateTime rangeStart,
 
                                          @RequestParam(required = false)
                                          @DateTimeFormat(pattern = DATE_TIME_FORMAT)
-                                         @NotNull
                                          LocalDateTime rangeEnd,
 
                                          @RequestParam(required = false, defaultValue = "false") Boolean onlyAvailable,
 
                                          @RequestParam(required = false)
                                          @Pattern(regexp = "EVENT_DATE|VIEWS")
-                                         @NotBlank
                                          String sort,
 
                                          @RequestParam(defaultValue = "0") Integer from,
