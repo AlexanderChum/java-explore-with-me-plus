@@ -15,6 +15,7 @@ import main.server.events.mapper.EventMapper;
 import main.server.events.model.EventModel;
 import main.server.events.repository.EventRepository;
 import main.server.events.services.AdminService;
+import main.server.exception.BadRequestException;
 import main.server.exception.ConflictException;
 import main.server.exception.NotFoundException;
 import main.server.location.Location;
@@ -78,7 +79,6 @@ public class AdminServiceImpl implements AdminService {
                 LocalDateTime.now()
         ));
 
-
         return result;
     }
 
@@ -95,6 +95,10 @@ public class AdminServiceImpl implements AdminService {
 
     private void changeEventState(EventModel event, StateActionAdmin state) {
         if (state == null) return;
+
+        if (event.getEventDate().isBefore(LocalDateTime.now())) {
+            throw new BadRequestException("Дата события не может быть в прошлом");
+        }
 
         if (state == StateActionAdmin.PUBLISH_EVENT) {
             if ((event.getEventDate().isBefore(LocalDateTime.now().plusHours(1)))) {
