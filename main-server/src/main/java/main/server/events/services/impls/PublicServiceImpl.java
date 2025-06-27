@@ -42,41 +42,41 @@ public class PublicServiceImpl implements PublicService {
     EventMapper eventMapper;
     JPAQueryFactory jpaQueryFactory;
     RequestRepository requestRepository;
-    StatsClient statsClient;
+    //StatsClient statsClient;
 
     public List<EventShortDto> getEventsWithFilters(String text, List<Long> categories, Boolean paid,
     LocalDateTime rangeStart, LocalDateTime rangeEnd, Boolean onlyAvailable, String sort, Integer from,
     Integer size, HttpServletRequest request) {
 
-        statsClient.postHit(EndpointHitDto.builder()
+        /*statsClient.postHit(EndpointHitDto.builder()
                 .app("main-service")
                 .uri(request.getRequestURI())
                 .ip(request.getRemoteAddr())
                 .timestamp(LocalDateTime.parse(LocalDateTime.now().format(formatter)))
-                .build());
+                .build());*/
 
         if ((rangeStart != null) && (rangeEnd != null) && (rangeStart.isAfter(rangeEnd)))
             throw new BadRequestException("Время начала на может быть позже окончания");
 
         List<EventModel> events = eventRepository.findAllByFiltersPublic(text, categories, paid, rangeStart, rangeEnd, onlyAvailable, (Pageable) PageRequest.of(from, size));
-        Map<Long, Long> views = getAmountOfViews(events);
+        //Map<Long, Long> views = getAmountOfViews(events);
 
         return events.stream()
                 .map(eventModel -> {
                     EventShortDto eventShort = eventMapper.toShortDto(eventModel);
-                    eventShort.setViews(views.get(eventModel.getId()));
+                    //eventShort.setViews(views.get(eventModel.getId()));
                     return eventShort;
                 })
                 .collect(Collectors.toCollection(ArrayList::new));
     }
 
     public EventFullDto getEventById(Long eventId, HttpServletRequest request) {
-        statsClient.postHit(EndpointHitDto.builder()
+        /*statsClient.postHit(EndpointHitDto.builder()
                 .app("main-service")
                 .uri(request.getRequestURI())
                 .ip(request.getRemoteAddr())
                 .timestamp(LocalDateTime.parse(LocalDateTime.now().format(formatter)))
-                .build());
+                .build());*/
 
         EventModel event = eventRepository.findById(eventId)
                 .orElseThrow(() -> new NotFoundException(String.format("Событие с id= %d не было найдено",eventId)));
@@ -86,12 +86,12 @@ public class PublicServiceImpl implements PublicService {
         }
 
         EventFullDto result = eventMapper.toFullDto(event);
-        result.setViews(getAmountOfViews(List.of(event)).get(event.getId()));
+        /*result.setViews(getAmountOfViews(List.of(event)).get(event.getId()));*/
 
         return result;
     }
 
-    private Map<Long, Long> getAmountOfViews(List<EventModel> events) {
+    /*private Map<Long, Long> getAmountOfViews(List<EventModel> events) {
         List<String> uris = events.stream()
                 .map(event -> "/events/" + event.getId())
                 .toList();
@@ -122,5 +122,5 @@ public class PublicServiceImpl implements PublicService {
                 .entrySet().stream()
                 .filter(entry -> entry.getKey() != -1L)
                 .collect(Collectors.toMap(Map.Entry::getKey, Map.Entry::getValue));
-    }
+    }*/
 }
