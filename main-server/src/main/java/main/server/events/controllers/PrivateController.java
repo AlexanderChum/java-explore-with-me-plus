@@ -50,11 +50,9 @@ public class PrivateController {
 
                                              @RequestParam(defaultValue = "10")
                                              @Positive
-                                             Integer size,
-
-                                             HttpServletRequest request) {
+                                             Integer size) {
         log.info("Получение событий, добавленных текущим пользователем");
-        return privateService.getUserEvents(userId, from, size, request);
+        return privateService.getUserEvents(userId, from, size);
     }
 
     @PostMapping
@@ -67,10 +65,9 @@ public class PrivateController {
 
     @GetMapping("/{eventId}")
     public EventFullDto getEventByEventIdAndUserId(@PathVariable @Positive Long userId,
-                                                   @PathVariable @Positive Long eventId,
-                                                   HttpServletRequest request) {
+                                                   @PathVariable @Positive Long eventId) {
         log.info("Получение полной информации о событии добавленном текущим пользователем");
-        return privateService.getEventByEventId(userId, eventId, request);
+        return privateService.getEventByEventId(userId, eventId);
     }
 
     @PatchMapping("/{eventId}")

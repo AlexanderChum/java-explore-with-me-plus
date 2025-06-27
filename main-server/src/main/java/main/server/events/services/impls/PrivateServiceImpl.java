@@ -33,6 +33,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDateTime;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
@@ -87,49 +88,55 @@ public class PrivateServiceImpl implements PrivateService {
 
         EventModel updatedEvent = eventRepository.save(event);
         EventFullDto result = eventMapper.toFullDto(updatedEvent);
-        result.setViews(statsService.getAmount(
+        /*result.setViews(statsService.getAmount(
                 eventId,
                 updatedEvent.getCreatedOn(),
                 LocalDateTime.now()
-        ));
+        ));*/
         return result;
     }
 
     @Transactional(readOnly = true)
-    public List<EventShortDto> getUserEvents(Long userId, Integer from, Integer size, HttpServletRequest request) {
+    public List<EventShortDto> getUserEvents(Long userId, Integer from, Integer size) {
         userExistence(userId);
-        statsService.addView(request);
+        //statsService.addView(request);
 
         Page<EventModel> events = eventRepository.findByInitiatorId(
                 userId,
                 PageRequest.of(from / size, size, Sort.by("eventDate").descending())
         );
 
-        Map<Long, Long> views = statsService.getAmountForEvents(events.getContent());
+        /*Map<Long, Long> views = statsService.getAmountForEvents(events.getContent());
         return events.getContent().stream()
                 .map(event -> {
                     EventShortDto dto = eventMapper.toShortDto(event);
                     dto.setViews(views.getOrDefault(event.getId(), 0L));
                     return dto;
                 })
-                .collect(Collectors.toList());
+                .collect(Collectors.toList());*/
+        return events.stream()
+                .map(eventModel -> {
+                    EventShortDto eventShort = eventMapper.toShortDto(eventModel);
+                    return eventShort;
+                })
+                .collect(Collectors.toCollection(ArrayList::new));
     }
 
     @Transactional(readOnly = true)
-    public EventFullDto getEventByEventId(Long userId, Long eventId, HttpServletRequest request) {
+    public EventFullDto getEventByEventId(Long userId, Long eventId) {
         userExistence(userId);
         EventModel event = eventRepository.findByIdAndInitiatorId(eventId, userId)
                 .orElseThrow(() -> new NotFoundException(String.format("Событие с id= %d " +
                                        "у пользователя с id= %d не найдено", eventId, userId)));
 
 
-        statsService.addView(request);
+        //statsService.addView(request);
         EventFullDto result = eventMapper.toFullDto(event);
-        result.setViews(statsService.getAmount(
+        /*result.setViews(statsService.getAmount(
                 eventId,
                 event.getCreatedOn(),
                 LocalDateTime.now()
-        ));
+        ));*/
         return result;
     }
 

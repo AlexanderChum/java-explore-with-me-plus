@@ -1,6 +1,5 @@
 package main.server.events.services.impls;
 
-import jakarta.servlet.http.HttpServletRequest;
 import lombok.AccessLevel;
 import lombok.RequiredArgsConstructor;
 import lombok.experimental.FieldDefaults;
@@ -27,7 +26,6 @@ import org.springframework.stereotype.Service;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Map;
 import java.util.stream.Collectors;
 
 @Service
@@ -43,18 +41,28 @@ public class AdminServiceImpl implements AdminService {
     StatsService statsService;
 
     public List<EventFullDto> getEventsWithAdminFilters(List<Long> users, List<String> states, List<Long> categories,
-        LocalDateTime rangeStart, LocalDateTime rangeEnd, Integer from, Integer size, HttpServletRequest request) {
-        statsService.addView(request);
+        LocalDateTime rangeStart, LocalDateTime rangeEnd, Integer from, Integer size) {
+        //statsService.addView(request);
+
+        if ((rangeStart != null) && (rangeEnd != null) && (rangeStart.isAfter(rangeEnd)) )
+            throw new BadRequestException("Время начала не может быть позже времени конца");
 
         List<EventModel> events = eventRepository.findAllByFiltersAdmin(users, states, categories, rangeStart, rangeEnd,
                 PageRequest.of(from, size));
 
-        Map<Long, Long> views = statsService.getAmountForEvents(events);
+        /*Map<Long, Long> views = statsService.getAmountForEvents(events);
         return events.stream()
                 .map(eventModel -> {
                     EventFullDto eventShort = eventMapper.toFullDto(eventModel);
                     eventShort.setViews(views.get(eventShort.getId()));
                     return eventShort;
+                })
+                .collect(Collectors.toCollection(ArrayList::new));*/
+
+        return events.stream()
+                .map(eventModel -> {
+                    EventFullDto eventFull = eventMapper.toFullDto(eventModel);
+                    return eventFull;
                 })
                 .collect(Collectors.toCollection(ArrayList::new));
     }
@@ -74,11 +82,11 @@ public class AdminServiceImpl implements AdminService {
         EventModel updatedEvent = eventRepository.save(event);
 
         EventFullDto result = eventMapper.toFullDto(updatedEvent);
-        result.setViews(statsService.getAmount(
+        /*result.setViews(statsService.getAmount(
                 eventId,
                 updatedEvent.getCreatedOn(),
                 LocalDateTime.now()
-        ));
+        ));*/
 
         return result;
     }

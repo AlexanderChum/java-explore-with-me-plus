@@ -1,5 +1,6 @@
 package main.server.events.services.impls;
 
+import client.StatsClient;
 import com.querydsl.jpa.impl.JPAQueryFactory;
 import jakarta.servlet.http.HttpServletRequest;
 import lombok.AccessLevel;
@@ -16,15 +17,20 @@ import main.server.events.services.PublicService;
 import main.server.exception.BadRequestException;
 import main.server.exception.NotFoundException;
 import main.server.request.RequestRepository;
-import main.server.statserver.StatsService;
+import main.server.statserver.StatsDto;
 import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
+import stat.dto.EndpointHitDto;
+import stat.dto.ViewStatsDto;
 
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
+
+import static stat.constant.Const.formatter;
 
 @Service
 @Slf4j
@@ -36,31 +42,42 @@ public class PublicServiceImpl implements PublicService {
     EventMapper eventMapper;
     JPAQueryFactory jpaQueryFactory;
     RequestRepository requestRepository;
-    StatsService statsService;
+    StatsClient statsClient;
 
     public List<EventShortDto> getEventsWithFilters(String text, List<Long> categories, Boolean paid,
-        LocalDateTime rangeStart, LocalDateTime rangeEnd, Boolean onlyAvailable, String sort, Integer from,
-        Integer size, HttpServletRequest request) {
+    LocalDateTime rangeStart, LocalDateTime rangeEnd, Boolean onlyAvailable, String sort, Integer from,
+    Integer size, HttpServletRequest request) {
+
+        statsClient.postHit(EndpointHitDto.builder()
+                .app("main-service")
+                .uri(request.getRequestURI())
+                .ip(request.getRemoteAddr())
+                .timestamp(LocalDateTime.parse(LocalDateTime.now().format(formatter)))
+                .build());
+
         if ((rangeStart != null) && (rangeEnd != null) && (rangeStart.isAfter(rangeEnd)))
             throw new BadRequestException("Время начала на может быть позже окончания");
 
-        statsService.addView(request);
+        List<EventModel> events = eventRepository.findAllByFiltersPublic(text, categories, paid, rangeStart, rangeEnd, onlyAvailable, (Pageable) PageRequest.of(from, size));
+        Map<Long, Long> views = getAmountOfViews(events);
 
-        List<EventModel> events = eventRepository.findAllByFiltersPublic(text, categories, paid, rangeStart, rangeEnd,
-            onlyAvailable, PageRequest.of(from, size));
-
-        Map<Long, Long> views = statsService.getAmountForEvents(events);
         return events.stream()
                 .map(eventModel -> {
                     EventShortDto eventShort = eventMapper.toShortDto(eventModel);
-                    eventShort.setViews(views.get(eventShort.getId()));
+                    eventShort.setViews(views.get(eventModel.getId()));
                     return eventShort;
                 })
-                .sorted((e1, e2) -> sort.equals("EVENT_DATE") ? e1.getEventDate().compareTo(e2.getEventDate()) : e1.getViews().compareTo(e2.getViews()))
                 .collect(Collectors.toCollection(ArrayList::new));
     }
 
     public EventFullDto getEventById(Long eventId, HttpServletRequest request) {
+        statsClient.postHit(EndpointHitDto.builder()
+                .app("main-service")
+                .uri(request.getRequestURI())
+                .ip(request.getRemoteAddr())
+                .timestamp(LocalDateTime.parse(LocalDateTime.now().format(formatter)))
+                .build());
+
         EventModel event = eventRepository.findById(eventId)
                 .orElseThrow(() -> new NotFoundException(String.format("Событие с id= %d не было найдено",eventId)));
 
@@ -68,13 +85,42 @@ public class PublicServiceImpl implements PublicService {
             throw new NotFoundException(String.format("Событие с id= %d недоступно, так как не опубликовано",eventId));
         }
 
-        statsService.addView(request);
-
-        Long views = statsService.getAmount(eventId, event.getCreatedOn(), LocalDateTime.now());
-
         EventFullDto result = eventMapper.toFullDto(event);
-        result.setViews(views);
+        result.setViews(getAmountOfViews(List.of(event)).get(event.getId()));
 
         return result;
+    }
+
+    private Map<Long, Long> getAmountOfViews(List<EventModel> events) {
+        List<String> uris = events.stream()
+                .map(event -> "/events/" + event.getId())
+                .toList();
+
+        LocalDateTime minDate = events.stream()
+                .map(EventModel::getCreatedOn)
+                .min(LocalDateTime::compareTo)
+                .orElse(LocalDateTime.now().minusDays(1));
+
+        List<ViewStatsDto> views = statsClient.getStatistics(minDate, LocalDateTime.now(), uris, true);
+        return views.stream()
+                .filter(dto -> dto.getUri() != null)
+                .collect(Collectors.toMap(
+                        dto -> {
+                            String[] parts = dto.getUri().split("/");
+                            if (parts.length >= 3) {
+                                try {
+                                    return Long.parseLong(parts[2]);
+                                } catch (NumberFormatException e) {
+                                    log.error("Не получилось вытащить id из uri: {}", dto.getUri());
+                                }
+                            }
+                            return -1L;
+                        },
+                        ViewStatsDto::getHits,
+                        (existing, replacement) -> existing
+                ))
+                .entrySet().stream()
+                .filter(entry -> entry.getKey() != -1L)
+                .collect(Collectors.toMap(Map.Entry::getKey, Map.Entry::getValue));
     }
 }

@@ -1,5 +1,6 @@
 package main.server.events.controllers;
 
+import com.fasterxml.jackson.annotation.JsonFormat;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
@@ -25,6 +26,7 @@ import java.time.LocalDateTime;
 import java.util.List;
 
 import static stat.constant.Const.DATE_TIME_FORMAT;
+import static stat.constant.Const.DATE_TIME_WITH_MILLIS_FORMAT;
 
 @RestController
 @RequestMapping("/events")

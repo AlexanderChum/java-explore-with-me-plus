@@ -1,6 +1,5 @@
 package main.server.events.services;
 
-import jakarta.servlet.http.HttpServletRequest;
 import main.server.events.dto.EventFullDto;
 import main.server.events.dto.EventShortDto;
 import main.server.events.dto.NewEventDto;
@@ -10,11 +9,11 @@ import java.util.List;
 
 public interface PrivateService {
 
-    List<EventShortDto> getUserEvents(Long userId, Integer from, Integer size, HttpServletRequest request);
+    List<EventShortDto> getUserEvents(Long userId, Integer from, Integer size);
 
     EventFullDto createEvent(NewEventDto newEventDto, Long userId);
 
-    EventFullDto getEventByEventId(Long userId, Long eventId, HttpServletRequest request);
+    EventFullDto getEventByEventId(Long userId, Long eventId);
 
     EventFullDto updateEventByEventId(UpdateEventUserRequest updateEventDto, Long userId, Long eventId);
 }

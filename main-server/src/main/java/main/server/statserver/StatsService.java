@@ -1,7 +1,9 @@
 package main.server.statserver;
 
+import client.StatsClient;
 import com.google.gson.Gson;
 import jakarta.servlet.http.HttpServletRequest;
+import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import main.server.events.model.EventModel;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -46,12 +48,13 @@ public class StatsService {
 
     private final RestTemplate restTemplate;
 
+
     @Autowired
     public StatsService(RestTemplate restTemplate) {
         this.restTemplate = restTemplate;
     }
 
-    public void addView(HttpServletRequest request) {
+    /*public void addView(HttpServletRequest request) {
         try {
             log.info("Отправка запроса в сервис статистики для URI: {}", request.getRequestURI());
             final String url = UriComponentsBuilder.newInstance()
@@ -92,9 +95,9 @@ public class StatsService {
             log.error("Неожиданная ошибка при сохранении просмотра: {}", e.getMessage());
             log.debug("Детали ошибки:", e);
         }
-    }
+    }*/
 
-    public Long getAmount(Long eventId, LocalDateTime start, LocalDateTime end) {
+    /*public Long getAmount(Long eventId, LocalDateTime start, LocalDateTime end) {
         try {
             final List<String> uris = List.of("/events/" + eventId);
             final String url = UriComponentsBuilder.newInstance()
@@ -141,12 +144,14 @@ public class StatsService {
             log.error("Неожиданная ошибка при получении статистики для события {}: {}", eventId, e.getMessage());
             return 0L;
         }
-    }
+    }*/
 
-    public Map<Long, Long> getAmountForEvents(List<EventModel> events) {
+    public Map<Long, Long> getViewsAmount(List<EventModel> events) {
         if (events == null || events.isEmpty()) {
             return Collections.emptyMap();
         }
+
+
 
         try {
             List<String> uris = events.stream()

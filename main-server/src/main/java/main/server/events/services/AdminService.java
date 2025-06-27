@@ -12,5 +12,5 @@ public interface AdminService {
     EventFullDto updateEvent(UpdateEventAdminRequest updateEventAdminRequest, Long eventId);
 
     List<EventFullDto> getEventsWithAdminFilters(List<Long> users, List<String> states, List<Long> categories,
-        LocalDateTime rangeStart, LocalDateTime rangeEnd, Integer from, Integer size, HttpServletRequest request);
+        LocalDateTime rangeStart, LocalDateTime rangeEnd, Integer from, Integer size);
 }
