@@ -17,4 +17,13 @@ public interface CategoryMapper {
 
     @Mapping(target = "id", ignore = true)
     void updateCategoryFromDto(CategoryDto categoryDto, @MappingTarget Category category);
+
+    default Category toEntity(Long id) {
+        if (id == null) {
+            return null;
+        }
+        Category c = new Category();
+        c.setId(id);
+        return c;
+    }
 }

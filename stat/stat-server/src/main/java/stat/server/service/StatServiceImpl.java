@@ -10,6 +10,7 @@ import stat.dto.EndpointHitDto;
 import stat.dto.ViewStatsDto;
 import stat.server.exception.ValidationException;
 import stat.server.mapper.StatMap;
+import stat.server.model.EndpointHit;
 import stat.server.repository.StatRepository;
 
 import java.time.LocalDateTime;
@@ -18,7 +19,6 @@ import java.util.List;
 @Service
 @RequiredArgsConstructor
 @Slf4j
-@Transactional(readOnly = true)
 @FieldDefaults(level = AccessLevel.PRIVATE, makeFinal = true)
 @SuppressWarnings("unused")
 public class StatServiceImpl implements StatService {
@@ -28,7 +28,12 @@ public class StatServiceImpl implements StatService {
     @Override
     @Transactional
     public EndpointHitDto saveHit(EndpointHitDto endpointHitDto) {
-        return statMap.toEndpointHitDto(statRepository.save(statMap.toEndpointHit(endpointHitDto)));
+        log.debug("Saving hit: app={}, uri={}, ip={}, timestamp={}",
+                endpointHitDto.getApp(), endpointHitDto.getUri(),
+                endpointHitDto.getIp(), endpointHitDto.getTimestamp());
+        EndpointHit savedHit = statRepository.save(statMap.toEndpointHit(endpointHitDto));
+        log.debug("Successfully saved hit with ID: {}", savedHit.getId());
+        return statMap.toEndpointHitDto(savedHit);
     }
 
     @Override
@@ -41,10 +46,16 @@ public class StatServiceImpl implements StatService {
             throw new ValidationException("Дата начала не должна быть позже даты окончания");
         }
 
+        List<ViewStatsDto> result;
         if (unique) {
-            return statRepository.getUniqueStats(startDate, endDate, uris);
+            log.debug("Querying for unique stats");
+            result = statRepository.getUniqueStats(startDate, endDate, uris);
         } else {
-            return statRepository.getStats(startDate, endDate, uris);
+            log.debug("Querying for non-unique stats");
+            result = statRepository.getStats(startDate, endDate, uris);
         }
+
+        log.debug("Service: Получен результат: {} ({} entries)", result, result != null ? result.size() : 0);
+        return result;
     }
 }

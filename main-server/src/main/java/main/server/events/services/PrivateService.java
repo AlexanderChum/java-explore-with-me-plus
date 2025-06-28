@@ -1,22 +1,19 @@
 package main.server.events.services;
 
+import main.server.events.dto.EventFullDto;
 import main.server.events.dto.EventShortDto;
-import main.server.request.dto.EventRequestStatusUpdateResultDto;
-import main.server.request.dto.ParticipationRequestDto;
+import main.server.events.dto.NewEventDto;
+import main.server.events.dto.UpdateEventUserRequest;
 
 import java.util.List;
 
 public interface PrivateService {
 
-    List<EventShortDto> getUserEvents();
+    List<EventShortDto> getUserEvents(Long userId, Integer from, Integer size);
 
-    EventShortDto createEvent();
+    EventFullDto createEvent(NewEventDto newEventDto, Long userId);
 
-    EventShortDto getEventByEventId();
+    EventFullDto getEventByEventId(Long userId, Long eventId);
 
-    EventShortDto updateEventByEventId();
-
-    List<ParticipationRequestDto> getEventRequests();
-
-    EventRequestStatusUpdateResultDto updateEventRequest();
+    EventFullDto updateEventByEventId(UpdateEventUserRequest updateEventDto, Long userId, Long eventId);
 }

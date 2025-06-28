@@ -29,7 +29,7 @@ public class PrivateRequestController {
 
     @GetMapping
     @ResponseStatus(HttpStatus.OK)
-    public List<ParticipationRequestDto> getRequests(@PathVariable @NotNull @Positive Long requesterId) {
+    public List<ParticipationRequestDto> getRequests(@PathVariable("userId") @NotNull @Positive Long requesterId) {
         return requestService.getRequests(requesterId);
     }
 

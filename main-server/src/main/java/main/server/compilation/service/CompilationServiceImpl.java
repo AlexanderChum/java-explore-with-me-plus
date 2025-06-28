@@ -9,6 +9,7 @@ import main.server.compilation.dto.CompilationDto;
 import main.server.compilation.dto.CompilationUpdateDto;
 import main.server.compilation.dto.CompilationsRequest;
 import main.server.compilation.model.Compilation;
+import main.server.compilation.model.QCompilation;
 import main.server.compilation.pagination.PaginationOffset;
 import main.server.events.model.EventModel;
 import main.server.events.repository.EventRepository;
@@ -18,6 +19,7 @@ import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+
 
 import java.util.HashSet;
 import java.util.List;
@@ -33,13 +35,19 @@ public class CompilationServiceImpl implements CompilationService {
     @Transactional
     @Override
     public CompilationDto addCompilation(NewCompilationDto newCompilationDto) {
-        Compilation compilation = compilationMapper.toEntity(newCompilationDto);
+        CompilationMapper.MapperContext context = new CompilationMapper.MapperContext(eventRepository);
+        Compilation compilation = compilationMapper.toEntity(newCompilationDto, context);
+
+        if (newCompilationDto.getPinned() == null) {
+            compilation.setPinned(false);
+        } else {
+            compilation.setPinned(newCompilationDto.getPinned());
+        }
 
         if (newCompilationDto.getEvents() != null && !newCompilationDto.getEvents().isEmpty()) {
             Set<EventModel> events = new HashSet<>(eventRepository.findAllById(newCompilationDto.getEvents()));
             compilation.setEvents(events);
         }
-
         Compilation savedCompilation = compilationRepository.save(compilation);
         return compilationMapper.toDto(savedCompilation);
     }
@@ -58,7 +66,6 @@ public class CompilationServiceImpl implements CompilationService {
     public CompilationDto updateCompilation(Long compId, CompilationUpdateDto updateDto) {
         Compilation compilation = compilationRepository.findById(compId)
                 .orElseThrow(() -> new NotFoundException("Событие с id " + compId + " не найдено"));
-
         if (updateDto.getTitle() != null) {
             compilation.setTitle(updateDto.getTitle());
         }
@@ -84,6 +91,7 @@ public class CompilationServiceImpl implements CompilationService {
     @Transactional(readOnly = true)
     @Override
     public List<CompilationDto> getCompilations(CompilationsRequest request, PaginationOffset pagination) {
+        QCompilation qCompilation = QCompilation.compilation;
         Predicate predicate = null;
         if (request.getPinned() != null) {
             predicate = qCompilation.pinned.eq(request.getPinned());

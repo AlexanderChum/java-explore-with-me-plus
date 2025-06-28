@@ -10,6 +10,7 @@ import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
 import jakarta.persistence.JoinColumn;
 import jakarta.persistence.ManyToOne;
+import jakarta.persistence.Table;
 import lombok.AccessLevel;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -21,6 +22,7 @@ import main.server.category.model.Category;
 import main.server.events.enums.EventState;
 import main.server.location.Location;
 import main.server.user.model.User;
+import org.hibernate.annotations.Formula;
 
 import java.time.LocalDateTime;
 
@@ -31,25 +33,28 @@ import java.time.LocalDateTime;
 @Builder
 @FieldDefaults(level = AccessLevel.PRIVATE)
 @Entity
+@Table(name = "event")
 public class EventModel {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     Long id;
 
-    @Column(name = "annotation")
+    @Column(name = "annotation", length = 2000)
     String annotation;
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "category_id")
     Category category;
 
+    @Formula("(select count(*) from participation_request p " +
+            " where p.event_id = id and p.status = 'CONFIRMED')")
     Long confirmedRequests;
 
     @Column(name = "created_on")
     LocalDateTime createdOn;
 
-    @Column(name = "description")
+    @Column(name = "description", length = 7000)
     String description;
 
     @Column(name = "event_date")
@@ -77,8 +82,6 @@ public class EventModel {
 
     @Column(name = "title")
     String title;
-
-    Long views; //как-то надо с сервера статистики это брать, видимо
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "location_id")
