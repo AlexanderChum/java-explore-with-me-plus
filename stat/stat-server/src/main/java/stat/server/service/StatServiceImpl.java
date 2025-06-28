@@ -28,8 +28,8 @@ public class StatServiceImpl implements StatService {
     @Override
     @Transactional
     public EndpointHitDto saveHit(EndpointHitDto endpointHitDto) {
-        log.debug("Saving hit: app={}, uri={}, ip={}, timestamp={}", 
-                endpointHitDto.getApp(), endpointHitDto.getUri(), 
+        log.debug("Saving hit: app={}, uri={}, ip={}, timestamp={}",
+                endpointHitDto.getApp(), endpointHitDto.getUri(),
                 endpointHitDto.getIp(), endpointHitDto.getTimestamp());
         EndpointHit savedHit = statRepository.save(statMap.toEndpointHit(endpointHitDto));
         log.debug("Successfully saved hit with ID: {}", savedHit.getId());
@@ -54,7 +54,7 @@ public class StatServiceImpl implements StatService {
             log.debug("Querying for non-unique stats");
             result = statRepository.getStats(startDate, endDate, uris);
         }
-        
+
         log.debug("Service: Получен результат: {} ({} entries)", result, result != null ? result.size() : 0);
         return result;
     }

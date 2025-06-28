@@ -14,7 +14,6 @@ import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestController;
 import stat.dto.EndpointHitDto;
 import stat.dto.ViewStatsDto;
- import stat.server.exception.ValidationException;
 import stat.server.service.StatService;
 
 import java.time.LocalDateTime;

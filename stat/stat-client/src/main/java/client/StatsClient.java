@@ -8,12 +8,12 @@ import org.springframework.web.client.RestTemplate;
 import stat.dto.EndpointHitDto;
 import stat.dto.ViewStatsDto;
 
-import java.net.URLEncoder;
-import java.nio.charset.StandardCharsets;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.Arrays;
 import java.util.List;
+
+import static stat.constant.Const.DATE_TIME_FORMAT;
 
 @Service
 @SuppressWarnings("unused")
@@ -21,12 +21,10 @@ public class StatsClient {
 
     private final RestTemplate restTemplate;
     private final String baseUrl;
-    // Use the format expected by the tests
-    private static final DateTimeFormatter DATE_TIME_FORMATTER = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss");
+    private static final DateTimeFormatter DATE_TIME_FORMATTER = DateTimeFormatter.ofPattern(DATE_TIME_FORMAT);
 
     public StatsClient(RestTemplate restTemplate) {
         this.restTemplate = restTemplate;
-        // Use default values for now
         this.baseUrl = "http://stat-server:9090";
     }
 
