@@ -64,9 +64,9 @@ public class ParticipationRequest {
             return id.equals(request.id);
         }
         return Objects.equals(created, request.created) &&
-               Objects.equals(event, request.event) &&
-               Objects.equals(requester, request.requester) &&
-               status == request.status;
+                Objects.equals(event, request.event) &&
+                Objects.equals(requester, request.requester) &&
+                status == request.status;
     }
 
     @Override

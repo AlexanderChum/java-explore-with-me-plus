@@ -38,13 +38,11 @@ public class CompilationServiceImpl implements CompilationService {
         CompilationMapper.MapperContext context = new CompilationMapper.MapperContext(eventRepository);
         Compilation compilation = compilationMapper.toEntity(newCompilationDto, context);
 
-        //
         if (newCompilationDto.getPinned() == null) {
             compilation.setPinned(false);
         } else {
             compilation.setPinned(newCompilationDto.getPinned());
         }
-        //
 
         if (newCompilationDto.getEvents() != null && !newCompilationDto.getEvents().isEmpty()) {
             Set<EventModel> events = new HashSet<>(eventRepository.findAllById(newCompilationDto.getEvents()));

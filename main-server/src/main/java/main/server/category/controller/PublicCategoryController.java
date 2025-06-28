@@ -29,10 +29,13 @@ public class PublicCategoryController {
 
     @GetMapping
     @ResponseStatus(HttpStatus.OK)
-    public List<CategoryDto> getCategories(@PositiveOrZero @RequestParam(name = "from",
-                                                   defaultValue = "0") Integer from,
-                                           @Positive @RequestParam(name = "size",
-                                                   defaultValue = "10") Integer size) {
+    public List<CategoryDto> getCategories(@PositiveOrZero
+                                           @RequestParam(name = "from", defaultValue = "0")
+                                           Integer from,
+
+                                           @Positive
+                                           @RequestParam(name = "size", defaultValue = "10")
+                                           Integer size) {
         log.info("Получение списка категорий");
         log.debug("Поступил запрос на получение списка категорий, параметры запроса: {}, {}", from, size);
         return categoryService.getCategories(from, size);
