@@ -17,7 +17,6 @@ import main.server.events.services.PublicService;
 import main.server.exception.BadRequestException;
 import main.server.exception.NotFoundException;
 import main.server.request.RequestRepository;
-import main.server.statserver.StatsDto;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
@@ -33,7 +32,6 @@ import java.util.Map;
 import java.util.stream.Collectors;
 
 import static java.util.stream.Collectors.toMap;
-import static stat.constant.Const.formatter;
 
 @Service
 @Slf4j

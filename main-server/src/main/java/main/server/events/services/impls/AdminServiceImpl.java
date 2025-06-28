@@ -19,7 +19,6 @@ import main.server.exception.NotFoundException;
 import main.server.location.Location;
 import main.server.location.LocationMapper;
 import main.server.location.LocationRepository;
-import main.server.statserver.StatsService;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.stereotype.Service;
 
@@ -38,7 +37,6 @@ public class AdminServiceImpl implements AdminService {
     CategoryRepository categoryRepository;
     LocationRepository locationRepository;
     LocationMapper locationMapper;
-    StatsService statsService;
 
     public List<EventFullDto> getEventsWithAdminFilters(List<Long> users, List<String> states, List<Long> categories,
         LocalDateTime rangeStart, LocalDateTime rangeEnd, Integer from, Integer size) {

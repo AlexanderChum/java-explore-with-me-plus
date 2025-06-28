@@ -1,6 +1,5 @@
 package main.server.events.services.impls;
 
-import jakarta.servlet.http.HttpServletRequest;
 import lombok.AccessLevel;
 import lombok.RequiredArgsConstructor;
 import lombok.experimental.FieldDefaults;
@@ -23,7 +22,6 @@ import main.server.exception.NotFoundException;
 import main.server.location.Location;
 import main.server.location.LocationMapper;
 import main.server.location.LocationRepository;
-import main.server.statserver.StatsService;
 import main.server.user.UserRepository;
 import main.server.user.model.User;
 import org.springframework.data.domain.Page;
@@ -35,7 +33,6 @@ import org.springframework.transaction.annotation.Transactional;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Map;
 import java.util.stream.Collectors;
 
 @Service
@@ -50,7 +47,6 @@ public class PrivateServiceImpl implements PrivateService {
     CategoryRepository categoryRepository;
     LocationRepository locationRepository;
     LocationMapper locationMapper;
-    StatsService statsService;
 
     @Transactional
     public EventFullDto createEvent(NewEventDto newEvent, Long userId) {
