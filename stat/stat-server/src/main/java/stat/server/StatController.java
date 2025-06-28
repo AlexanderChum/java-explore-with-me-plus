@@ -19,6 +19,8 @@ import stat.server.service.StatService;
 import java.time.LocalDateTime;
 import java.util.List;
 
+import static stat.constant.Const.DATE_TIME_FORMAT;
+
 @RestController
 @FieldDefaults(level = AccessLevel.PRIVATE, makeFinal = true)
 @RequiredArgsConstructor
@@ -53,10 +55,10 @@ public class StatController {
     @GetMapping("/stats")
     @ResponseStatus(HttpStatus.OK)
     public List<ViewStatsDto> getStats(@RequestParam(name = "start", required = true)
-                                       @DateTimeFormat(pattern = "yyyy-MM-dd HH:mm:ss")
+                                       @DateTimeFormat(pattern = DATE_TIME_FORMAT)
                                        LocalDateTime start,
                                        @RequestParam(name = "end", required = true)
-                                       @DateTimeFormat(pattern = "yyyy-MM-dd HH:mm:ss")
+                                       @DateTimeFormat(pattern = DATE_TIME_FORMAT)
                                        LocalDateTime end,
                                        @RequestParam(name = "uris", required = false) List<String> uris,
                                        @RequestParam(name = "unique", defaultValue = "false") Boolean unique) {
