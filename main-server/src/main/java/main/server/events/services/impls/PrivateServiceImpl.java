@@ -6,7 +6,7 @@ import lombok.RequiredArgsConstructor;
 import lombok.experimental.FieldDefaults;
 import lombok.extern.slf4j.Slf4j;
 import main.server.category.model.Category;
-import main.server.category.repository.CategoryRepository;
+import main.server.category.service.CategoryServiceImpl;
 import main.server.events.dto.EventFullDto;
 import main.server.events.dto.EventShortDto;
 import main.server.events.dto.NewEventDto;
@@ -22,9 +22,9 @@ import main.server.exception.ConflictException;
 import main.server.exception.NotFoundException;
 import main.server.location.Location;
 import main.server.location.LocationMapper;
-import main.server.location.LocationRepository;
-import main.server.user.UserRepository;
+import main.server.location.service.LocationServiceImpl;
 import main.server.user.model.User;
+import main.server.user.service.UserServiceImpl;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Sort;
@@ -37,6 +37,7 @@ import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
 import java.util.stream.Collectors;
 
 @Service
@@ -47,9 +48,9 @@ import java.util.stream.Collectors;
 public class PrivateServiceImpl implements PrivateService {
     EventRepository eventRepository;
     EventMapper eventMapper;
-    UserRepository userRepository;
-    CategoryRepository categoryRepository;
-    LocationRepository locationRepository;
+    UserServiceImpl userService;
+    CategoryServiceImpl categoryService;
+    LocationServiceImpl locationService;
     LocationMapper locationMapper;
     StatsClient statsClient;
 
@@ -59,7 +60,7 @@ public class PrivateServiceImpl implements PrivateService {
         User user = userExistence(userId);
         Category category = categoryExistence(newEvent.getCategory());
 
-        Location location = locationRepository.save(locationMapper.toEntity(newEvent.getLocationDto()));
+        Location location = locationService.save(locationMapper.toEntity(newEvent.getLocationDto()));
 
         EventModel event = eventMapper.toEntity(newEvent, category, user, location);
 
@@ -85,8 +86,8 @@ public class PrivateServiceImpl implements PrivateService {
         updateEventFields(event, update);
 
         log.debug("Сборка события для ответа");
-        EventModel updatedEvent = eventRepository.save(event);
-        EventFullDto result = eventMapper.toFullDto(updatedEvent);
+
+        EventFullDto result = eventMapper.toFullDto(event);
         result.setViews(getAmountOfViews(List.of(event)).get(eventId));
         return result;
     }
@@ -126,12 +127,12 @@ public class PrivateServiceImpl implements PrivateService {
     }
 
     private User userExistence(Long userId) {
-        return userRepository.findById(userId)
+        return userService.findById(userId)
                 .orElseThrow(() -> new NotFoundException(String.format("Пользователь c id= %d не найден", userId)));
     }
 
     private Category categoryExistence(Long categoryId) {
-        return categoryRepository.findById(categoryId)
+        return categoryService.findById(categoryId)
                 .orElseThrow(() -> new NotFoundException(String.format("Категория c id= %d не найдена", categoryId)));
     }
 
@@ -216,5 +217,17 @@ public class PrivateServiceImpl implements PrivateService {
             log.error("Не удалось получить статистику");
         }
         return viewsMap;
+    }
+
+    public List<EventModel> findAllByCategoryId(Long catId) {
+        return eventRepository.findAllByCategoryId(catId);
+    }
+
+    public List<EventModel> findAllById(List<Long> ids) {
+        return eventRepository.findAllById(ids);
+    }
+
+    public Optional<EventModel> findById(Long id) {
+        return eventRepository.findById(id);
     }
 }

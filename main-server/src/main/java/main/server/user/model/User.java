@@ -6,6 +6,9 @@ import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
 import jakarta.persistence.Table;
+import jakarta.validation.constraints.Email;
+import jakarta.validation.constraints.NotBlank;
+import jakarta.validation.constraints.Size;
 import lombok.AccessLevel;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -29,9 +32,14 @@ public class User {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     Long id;
 
+    @NotBlank(message = "Имя не может быть пустым")
+    @Size(max = 250, message = "Имя должно быть меньше 250 символов")
     @Column(name = "name")
     String name;
 
+    @NotBlank(message = "Email Имя не может быть пустым")
+    @Email(message = "Email должен быть действительным")
+    @Size(max = 254, message = "Email должен быть меньше 254 символов")
     @Column(name = "email")
     String email;
 

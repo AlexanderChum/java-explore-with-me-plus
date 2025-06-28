@@ -46,7 +46,7 @@ public class PublicController {
                                          @DateTimeFormat(pattern = DATE_TIME_FORMAT)
                                          LocalDateTime rangeEnd,
 
-                                         @RequestParam(required = false, defaultValue = "false") Boolean onlyAvailable,
+                                         @RequestParam(defaultValue = "false") Boolean onlyAvailable,
 
                                          @RequestParam(required = false)
                                          @Pattern(regexp = "EVENT_DATE|VIEWS")

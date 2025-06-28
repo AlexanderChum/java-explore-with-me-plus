@@ -6,7 +6,7 @@ import main.server.compilation.dto.NewCompilationDto;
 import main.server.compilation.model.Compilation;
 import main.server.events.mapper.EventMapper;
 import main.server.events.model.EventModel;
-import main.server.events.repository.EventRepository;
+import main.server.events.services.impls.PrivateServiceImpl;
 import org.mapstruct.Context;
 import org.mapstruct.Mapper;
 import org.mapstruct.Mapping;
@@ -38,17 +38,17 @@ public interface CompilationMapper {
     }
 
     default EventModel mapToEventModel(Long eventId, @Context MapperContext context) {
-        return (context != null && context.getEventRepository() != null)
-                ? context.getEventRepository().findById(eventId).orElse(null)
+        return (context != null && context.getEvenService() != null)
+                ? context.getEvenService().findById(eventId).orElse(null)
                 : null;
     }
 
     @Getter
     class MapperContext {
-        private final EventRepository eventRepository;
+        private final PrivateServiceImpl evenService;
 
-        public MapperContext(EventRepository eventRepository) {
-            this.eventRepository = eventRepository;
+        public MapperContext(PrivateServiceImpl evenService) {
+            this.evenService = evenService;
         }
     }
 }

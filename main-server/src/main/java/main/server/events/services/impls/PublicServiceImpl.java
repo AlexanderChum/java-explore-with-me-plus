@@ -16,7 +16,6 @@ import main.server.events.repository.EventRepository;
 import main.server.events.services.PublicService;
 import main.server.exception.BadRequestException;
 import main.server.exception.NotFoundException;
-import main.server.request.RequestRepository;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -40,7 +39,6 @@ public class PublicServiceImpl implements PublicService {
     EventRepository eventRepository;
     EventMapper eventMapper;
     JPAQueryFactory jpaQueryFactory;
-    RequestRepository requestRepository;
     StatsClient statsClient;
 
     @Transactional(readOnly = true)

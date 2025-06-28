@@ -11,6 +11,8 @@ import org.springframework.http.HttpStatus;
 import java.time.LocalDateTime;
 import java.util.List;
 
+import static stat.constant.Const.DATE_TIME_FORMAT;
+
 @Data
 @Builder
 @NoArgsConstructor
@@ -21,7 +23,7 @@ public class ApiError {
     private String reason;
     private String message;
 
-    @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yyyy-MM-dd HH:mm:ss")
+    @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = DATE_TIME_FORMAT)
     private LocalDateTime timestamp;
 
     private List<String> errors;

@@ -8,13 +8,14 @@ import main.server.category.mapper.CategoryMapper;
 import main.server.category.model.Category;
 import main.server.category.repository.CategoryRepository;
 import main.server.events.model.EventModel;
-import main.server.events.repository.EventRepository;
+import main.server.events.services.impls.PrivateServiceImpl;
 import main.server.exception.ConflictException;
 import main.server.exception.NotFoundException;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
+import java.util.Optional;
 
 @Service
 @RequiredArgsConstructor
@@ -23,7 +24,7 @@ import java.util.List;
 public class CategoryServiceImpl implements CategoryService {
 
     CategoryRepository categoryRepository;
-    EventRepository eventRepository;
+    PrivateServiceImpl eventService;
     CategoryMapper mapper;
 
     @Override
@@ -36,7 +37,7 @@ public class CategoryServiceImpl implements CategoryService {
     @Override
     @Transactional
     public void deleteCategory(Long catId) {
-        List<EventModel> events = eventRepository.findAllByCategoryId(catId);
+        List<EventModel> events = eventService.findAllByCategoryId(catId);
         if (events.isEmpty()) {
             categoryRepository.deleteById(catId);
         } else {
@@ -53,7 +54,7 @@ public class CategoryServiceImpl implements CategoryService {
             validateNameExist(categoryDto.getName());
         }
         mapper.updateCategoryFromDto(categoryDto, category);
-        return mapper.toCategoryDto(categoryRepository.save(category));
+        return mapper.toCategoryDto(category);
     }
 
     @Override
@@ -76,5 +77,9 @@ public class CategoryServiceImpl implements CategoryService {
         if (categoryRepository.existsByName(name)) {
             throw new ConflictException("Название категории уже существует");
         }
+    }
+
+    public Optional<Category> findById(Long Id) {
+        return categoryRepository.findById(Id);
     }
 }

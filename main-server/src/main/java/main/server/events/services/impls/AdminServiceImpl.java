@@ -6,7 +6,7 @@ import lombok.RequiredArgsConstructor;
 import lombok.experimental.FieldDefaults;
 import lombok.extern.slf4j.Slf4j;
 import main.server.category.model.Category;
-import main.server.category.repository.CategoryRepository;
+import main.server.category.service.CategoryServiceImpl;
 import main.server.events.dto.EventFullDto;
 import main.server.events.dto.UpdateEventAdminRequest;
 import main.server.events.enums.EventState;
@@ -20,7 +20,7 @@ import main.server.exception.ConflictException;
 import main.server.exception.NotFoundException;
 import main.server.location.Location;
 import main.server.location.LocationMapper;
-import main.server.location.LocationRepository;
+import main.server.location.service.LocationServiceImpl;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -42,8 +42,8 @@ import java.util.stream.Collectors;
 public class AdminServiceImpl implements AdminService {
     EventMapper eventMapper;
     EventRepository eventRepository;
-    CategoryRepository categoryRepository;
-    LocationRepository locationRepository;
+    CategoryServiceImpl categoryService;
+    LocationServiceImpl locationService;
     LocationMapper locationMapper;
     StatsClient statsClient;
 
@@ -84,10 +84,8 @@ public class AdminServiceImpl implements AdminService {
         changeEventState(event, updateRequest.getState());
         updateEventFields(event, updateRequest);
 
-        EventModel updatedEvent = eventRepository.save(event);
-
         log.debug("Сборка события для ответа");
-        EventFullDto result = eventMapper.toFullDto(updatedEvent);
+        EventFullDto result = eventMapper.toFullDto(event);
         result.setViews(getAmountOfViews(List.of(event)).get(eventId));
 
         return result;
@@ -130,7 +128,7 @@ public class AdminServiceImpl implements AdminService {
         }
 
         if (updateRequest.getCategory() != null) {
-            Category category = categoryRepository.findById(updateRequest.getCategory())
+            Category category = categoryService.findById(updateRequest.getCategory())
                     .orElseThrow(() -> new NotFoundException("Категория не найдена"));
             event.setCategory(category);
         }
@@ -161,7 +159,7 @@ public class AdminServiceImpl implements AdminService {
 
         if (updateRequest.getLocationDto() != null) {
             Location newLocation = locationMapper.toEntity(updateRequest.getLocationDto());
-            locationRepository.save(newLocation);
+            locationService.save(newLocation);
             event.setLocation(newLocation);
         }
     }

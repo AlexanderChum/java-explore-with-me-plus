@@ -2,6 +2,7 @@ package main.server.compilation.service;
 
 import com.querydsl.core.types.Predicate;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import main.server.compilation.CompilationMapper;
 import main.server.compilation.CompilationRepository;
 import main.server.compilation.dto.NewCompilationDto;
@@ -12,7 +13,7 @@ import main.server.compilation.model.Compilation;
 import main.server.compilation.model.QCompilation;
 import main.server.compilation.pagination.PaginationOffset;
 import main.server.events.model.EventModel;
-import main.server.events.repository.EventRepository;
+import main.server.events.services.impls.PrivateServiceImpl;
 import main.server.exception.NotFoundException;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
@@ -21,21 +22,23 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 
+import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 
+@Slf4j
 @Service
 @RequiredArgsConstructor
 public class CompilationServiceImpl implements CompilationService {
     private final CompilationRepository compilationRepository;
     private final CompilationMapper compilationMapper;
-    private final EventRepository eventRepository;
+    PrivateServiceImpl eventService;
 
     @Transactional
     @Override
     public CompilationDto addCompilation(NewCompilationDto newCompilationDto) {
-        CompilationMapper.MapperContext context = new CompilationMapper.MapperContext(eventRepository);
+        CompilationMapper.MapperContext context = new CompilationMapper.MapperContext(eventService);
         Compilation compilation = compilationMapper.toEntity(newCompilationDto, context);
 
         if (newCompilationDto.getPinned() == null) {
@@ -45,10 +48,11 @@ public class CompilationServiceImpl implements CompilationService {
         }
 
         if (newCompilationDto.getEvents() != null && !newCompilationDto.getEvents().isEmpty()) {
-            Set<EventModel> events = new HashSet<>(eventRepository.findAllById(newCompilationDto.getEvents()));
+            Set<EventModel> events = new HashSet<>(eventService.findAllById(new ArrayList<>(newCompilationDto.getEvents())));
             compilation.setEvents(events);
         }
         Compilation savedCompilation = compilationRepository.save(compilation);
+        log.info("Создаем подборку");
         return compilationMapper.toDto(savedCompilation);
     }
 
@@ -58,6 +62,7 @@ public class CompilationServiceImpl implements CompilationService {
         if (!compilationRepository.existsById(compId)) {
             throw new NotFoundException("Событие с id " + compId + " не найдено");
         }
+        log.info("Удаляем подборку id={}", compId);
         compilationRepository.deleteById(compId);
     }
 
@@ -73,11 +78,11 @@ public class CompilationServiceImpl implements CompilationService {
             compilation.setPinned(updateDto.getPinned());
         }
         if (updateDto.getEvents() != null) {
-            Set<EventModel> events = new HashSet<>(eventRepository.findAllById(updateDto.getEvents()));
+            Set<EventModel> events = new HashSet<>(eventService.findAllById(new ArrayList<>(updateDto.getEvents())));
             compilation.setEvents(events);
         }
-        Compilation savedCompilation = compilationRepository.save(compilation);
-        return compilationMapper.toDto(savedCompilation);
+        log.info("Обновляем подборку id={}", compId);
+        return compilationMapper.toDto(compilation);
     }
 
     @Transactional(readOnly = true)

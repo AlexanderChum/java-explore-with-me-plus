@@ -66,7 +66,7 @@ public class RequestServiceImpl implements RequestService {
         ParticipationRequest participationRequest = validateRequestExist(requesterId, requestId);
 
         participationRequest.setStatus(RequestStatus.CANCELED);
-        return requestMapper.toParticipationRequestDto(requestRepository.save(participationRequest));
+        return requestMapper.toParticipationRequestDto(participationRequest);
     }
 
     @Transactional(readOnly = true)

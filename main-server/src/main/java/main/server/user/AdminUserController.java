@@ -6,12 +6,11 @@ import jakarta.validation.constraints.PositiveOrZero;
 import lombok.AccessLevel;
 import lombok.RequiredArgsConstructor;
 import lombok.experimental.FieldDefaults;
+import lombok.extern.slf4j.Slf4j;
 import main.server.user.dto.NewUserDto;
 import main.server.user.dto.UpdateUserDto;
 import main.server.user.dto.UserDto;
 import main.server.user.service.UserService;
-import org.springframework.data.domain.PageRequest;
-import org.springframework.data.domain.Sort;
 import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -26,6 +25,7 @@ import org.springframework.web.bind.annotation.RestController;
 
 import java.util.List;
 
+@Slf4j
 @RestController
 @RequestMapping("/admin/users")
 @FieldDefaults(level = AccessLevel.PRIVATE, makeFinal = true)
@@ -55,10 +55,7 @@ public class AdminUserController {
                                      @Positive
                                      @RequestParam(name = "size", defaultValue = "10")
                                      Integer size) {
-        Sort sort = Sort.by("id").ascending();
-        PageRequest pageable = PageRequest.of(from, size, sort);
-
-        return userService.getUsers(userIds, pageable).toList();
+        return userService.getUsers(userIds, from, size);
     }
 
     @PatchMapping("/{userId}")

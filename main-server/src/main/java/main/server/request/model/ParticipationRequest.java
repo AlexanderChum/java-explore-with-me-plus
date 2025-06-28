@@ -11,6 +11,7 @@ import jakarta.persistence.Id;
 import jakarta.persistence.JoinColumn;
 import jakarta.persistence.ManyToOne;
 import jakarta.persistence.Table;
+import jakarta.validation.constraints.NotNull;
 import lombok.AccessLevel;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -41,18 +42,22 @@ public class ParticipationRequest {
 
     @CreatedDate
     @Column(name = "created", updatable = false)
+    @NotNull(message = "Дата создания не может быть пустой")
     LocalDateTime created;
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "event_id")
+    @NotNull(message = "Event не может быть пустым")
     EventModel event;
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "requester_id")
+    @NotNull(message = "Requester не может быть пустым")
     User requester;
 
     @Enumerated(EnumType.STRING)
     @Column(name = "status")
+    @NotNull(message = "Статус не может быть пустым")
     RequestStatus status;
 
     @Override

@@ -3,6 +3,7 @@ package main.server.user.service;
 import lombok.AccessLevel;
 import lombok.RequiredArgsConstructor;
 import lombok.experimental.FieldDefaults;
+import lombok.extern.slf4j.Slf4j;
 import main.server.exception.DuplicatedDataException;
 import main.server.exception.NotFoundException;
 import main.server.user.UserMapper;
@@ -13,12 +14,14 @@ import main.server.user.dto.UserDto;
 import main.server.user.model.User;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
 import java.util.Optional;
 
+@Slf4j
 @Service
 @FieldDefaults(level = AccessLevel.PRIVATE, makeFinal = true)
 @RequiredArgsConstructor
@@ -31,23 +34,28 @@ public class UserServiceImpl implements UserService {
     @Override
     public UserDto createUser(NewUserDto newUserDto) {
         validateEmailExist(newUserDto.getEmail());
+        log.info("создаем User {}", newUserDto.getName());
         return userMapper.toUserDto(userRepository.save(userMapper.toUser(newUserDto)));
     }
 
     @Override
     public void deleteUserById(Long userId) {
         validateUserExist(userId);
+        log.info("удаляем User id={}", userId);
         userRepository.deleteById(userId);
     }
 
     @Transactional(readOnly = true)
     @Override
-    public Page<UserDto> getUsers(List<Long> userIds, PageRequest pageable) {
+    public List<UserDto> getUsers(List<Long> userIds, int from, int size) {
+        PageRequest pageable = PageRequest.of(from / size, size, Sort.by("id").ascending());
+        Page<User> usersPage;
         if (userIds == null || userIds.isEmpty()) {
-            return userMapper.toUserDtoPage(userRepository.findAll(pageable).getContent(), pageable);
+            usersPage = userRepository.findAll(pageable);
         } else {
-            return userMapper.toUserDtoPage(userRepository.findByIdIn(userIds, pageable).getContent(), pageable);
+            usersPage = userRepository.findByIdIn(userIds, pageable);
         }
+        return userMapper.toUserDtoPage(usersPage.getContent(), pageable).getContent();
     }
 
     @Override
@@ -55,7 +63,8 @@ public class UserServiceImpl implements UserService {
         User user = validateUserExist(userId);
         validateEmailExist(updateUserDto.getEmail(), userId);
         updateUserFields(user, updateUserDto);
-        return (userMapper.toUserDto(userRepository.save(user)));
+        log.info("обновляем информацию о User id={}", userId);
+        return userMapper.toUserDto(user);
     }
 
     private void validateEmailExist(String email, Long currentUserId) {
@@ -83,5 +92,9 @@ public class UserServiceImpl implements UserService {
         if (updateUserDto.hasName()) {
             user.setName(updateUserDto.getName());
         }
+    }
+
+    public Optional<User> findById(Long Id) {
+        return userRepository.findById(Id);
     }
 }
