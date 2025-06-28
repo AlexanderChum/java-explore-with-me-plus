@@ -1,5 +1,6 @@
 package main.server.events.services.impls;
 
+import client.StatsClient;
 import lombok.AccessLevel;
 import lombok.RequiredArgsConstructor;
 import lombok.experimental.FieldDefaults;
@@ -29,10 +30,13 @@ import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import stat.dto.ViewStatsDto;
 
 import java.time.LocalDateTime;
-import java.util.ArrayList;
+import java.util.Collections;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.stream.Collectors;
 
 @Service
@@ -47,26 +51,24 @@ public class PrivateServiceImpl implements PrivateService {
     CategoryRepository categoryRepository;
     LocationRepository locationRepository;
     LocationMapper locationMapper;
+    StatsClient statsClient;
 
     @Transactional
     public EventFullDto createEvent(NewEventDto newEvent, Long userId) {
+        log.debug("Получен запрос на создание нового события");
         User user = userExistence(userId);
         Category category = categoryExistence(newEvent.getCategory());
 
         Location location = locationRepository.save(locationMapper.toEntity(newEvent.getLocationDto()));
 
         EventModel event = eventMapper.toEntity(newEvent, category, user, location);
-        /*event.setInitiator(user);
-        event.setCategory(category);
-        event.setLocation(location);
-        event.setState(EventState.PENDING);
-        event.setCreatedOn(LocalDateTime.now());*/
 
         return eventMapper.toFullDto(eventRepository.save(event));
     }
 
     @Transactional
     public EventFullDto updateEventByEventId(UpdateEventUserRequest update, Long userId, Long eventId) {
+        log.debug("Получен запрос на обновление события пользователем");
         userExistence(userId);
         EventModel event = eventRepository.findById(eventId)
                 .orElseThrow(() -> new NotFoundException(String.format("Событие  c id= %d не найдено", eventId)));
@@ -82,57 +84,44 @@ public class PrivateServiceImpl implements PrivateService {
         changeEventState(event, update);
         updateEventFields(event, update);
 
+        log.debug("Сборка события для ответа");
         EventModel updatedEvent = eventRepository.save(event);
         EventFullDto result = eventMapper.toFullDto(updatedEvent);
-        /*result.setViews(statsService.getAmount(
-                eventId,
-                updatedEvent.getCreatedOn(),
-                LocalDateTime.now()
-        ));*/
+        result.setViews(getAmountOfViews(List.of(event)).get(eventId));
         return result;
     }
 
     @Transactional(readOnly = true)
     public List<EventShortDto> getUserEvents(Long userId, Integer from, Integer size) {
+        log.debug("Получен запрос для получения событий пользователя");
         userExistence(userId);
-        //statsService.addView(request);
 
         Page<EventModel> events = eventRepository.findByInitiatorId(
                 userId,
                 PageRequest.of(from / size, size, Sort.by("eventDate").descending())
         );
 
-        /*Map<Long, Long> views = statsService.getAmountForEvents(events.getContent());
+        Map<Long, Long> views = getAmountOfViews(events.getContent());
         return events.getContent().stream()
                 .map(event -> {
                     EventShortDto dto = eventMapper.toShortDto(event);
                     dto.setViews(views.getOrDefault(event.getId(), 0L));
                     return dto;
                 })
-                .collect(Collectors.toList());*/
-        return events.stream()
-                .map(eventModel -> {
-                    EventShortDto eventShort = eventMapper.toShortDto(eventModel);
-                    return eventShort;
-                })
-                .collect(Collectors.toCollection(ArrayList::new));
+                .collect(Collectors.toList());
     }
 
     @Transactional(readOnly = true)
     public EventFullDto getEventByEventId(Long userId, Long eventId) {
+        log.debug("Получен запрос события по id");
         userExistence(userId);
         EventModel event = eventRepository.findByIdAndInitiatorId(eventId, userId)
                 .orElseThrow(() -> new NotFoundException(String.format("Событие с id= %d " +
                                        "у пользователя с id= %d не найдено", eventId, userId)));
 
-
-        //statsService.addView(request);
+        log.debug("Сборка события для ответа");
         EventFullDto result = eventMapper.toFullDto(event);
-        /*result.setViews(statsService.getAmount(
-                eventId,
-                event.getCreatedOn(),
-                LocalDateTime.now()
-        ));*/
+        result.setViews(getAmountOfViews(List.of(event)).get(eventId));
         return result;
     }
 
@@ -193,5 +182,39 @@ public class PrivateServiceImpl implements PrivateService {
         if (update.getLocation() != null) {
             event.setLocation(locationMapper.toEntity(update.getLocation()));
         }
+    }
+
+    private Map<Long, Long> getAmountOfViews(List<EventModel> events) {
+        if (events == null || events.isEmpty()) {
+            return Collections.emptyMap();
+        }
+        List<String> uris = events.stream()
+                .map(event -> "/events/" + event.getId())
+                .distinct()
+                .collect(Collectors.toList());
+
+        LocalDateTime startTime = LocalDateTime.now().minusDays(1);
+        LocalDateTime endTime = LocalDateTime.now().plusMinutes(5);
+
+        Map<Long, Long> viewsMap = new HashMap<>();
+        try {
+            log.debug("Получение статистики по времени для URI: {} с {} по {}", uris, startTime, endTime);
+            List<ViewStatsDto> stats = statsClient.getStatistics(
+                    startTime,
+                    endTime,
+                    uris,
+                    true
+            );
+            log.debug("Получение статистики");
+            if (stats != null && !stats.isEmpty()) {
+                for (ViewStatsDto stat : stats) {
+                    Long eventId = Long.parseLong(stat.getUri().substring("/events/".length()));
+                    viewsMap.put(eventId, stat.getHits());
+                }
+            }
+        } catch (Exception e) {
+            log.error("Не удалось получить статистику");
+        }
+        return viewsMap;
     }
 }
