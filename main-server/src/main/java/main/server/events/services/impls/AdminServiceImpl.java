@@ -52,7 +52,7 @@ public class AdminServiceImpl implements AdminService {
         LocalDateTime rangeStart, LocalDateTime rangeEnd, Integer from, Integer size) {
 
         log.debug("Получен запрос на получения админ события по фильтрам");
-        if ((rangeStart != null) && (rangeEnd != null) && (rangeStart.isAfter(rangeEnd)) )
+        if ((rangeStart != null) && (rangeEnd != null) && (rangeStart.isAfter(rangeEnd)))
             throw new BadRequestException("Время начала не может быть позже времени конца");
 
         List<EventModel> events = eventRepository.findAllByFiltersAdmin(users, states, categories, rangeStart, rangeEnd,
