@@ -48,7 +48,7 @@ public class EventModel {
     Category category;
 
     @Formula("(select count(*) from participation_request p " +
-             " where p.event_id = id and p.status = 'CONFIRMED')")
+            " where p.event_id = id and p.status = 'CONFIRMED')")
     Long confirmedRequests;
 
     @Column(name = "created_on")

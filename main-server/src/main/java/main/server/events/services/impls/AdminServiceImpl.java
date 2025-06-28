@@ -1,7 +1,6 @@
 package main.server.events.services.impls;
 
 import client.StatsClient;
-import jakarta.servlet.http.HttpServletRequest;
 import lombok.AccessLevel;
 import lombok.RequiredArgsConstructor;
 import lombok.experimental.FieldDefaults;
@@ -24,7 +23,6 @@ import main.server.location.LocationMapper;
 import main.server.location.LocationRepository;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.stereotype.Service;
-import stat.dto.EndpointHitDto;
 
 import java.time.LocalDateTime;
 import java.util.ArrayList;
@@ -45,17 +43,7 @@ public class AdminServiceImpl implements AdminService {
     StatsClient statsClient;
 
     public List<EventFullDto> getEventsWithAdminFilters(List<Long> users, List<String> states, List<Long> categories,
-                                                        LocalDateTime rangeStart, LocalDateTime rangeEnd, Integer from, Integer size, HttpServletRequest request) {
-        try {
-            statsClient.postHit(EndpointHitDto.builder()
-                    .app("main-service")
-                    .uri(request.getRequestURI())
-                    .ip(request.getRemoteAddr())
-                    .timestamp(LocalDateTime.now())
-                    .build());
-        } catch (Exception e) {
-            log.error("Failed to send hit to stats service: {}", e.getMessage());
-        }
+        LocalDateTime rangeStart, LocalDateTime rangeEnd, Integer from, Integer size) {
 
         if ((rangeStart != null) && (rangeEnd != null) && (rangeStart.isAfter(rangeEnd)) )
             throw new BadRequestException("Время начала не может быть позже времени конца");

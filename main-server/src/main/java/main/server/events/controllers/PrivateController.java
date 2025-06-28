@@ -1,6 +1,5 @@
 package main.server.events.controllers;
 
-import jakarta.servlet.http.HttpServletRequest;
 import jakarta.validation.Valid;
 import jakarta.validation.constraints.Positive;
 import jakarta.validation.constraints.PositiveOrZero;
@@ -59,7 +58,7 @@ public class PrivateController {
     @ResponseStatus(HttpStatus.CREATED)
     public EventFullDto createEvent(@Valid @RequestBody NewEventDto newEventDto,
                                     @PathVariable @Positive Long userId) {
-        log.info("Добавление нового события");
+        log.info("Добавление нового события пользователем");
         return privateService.createEvent(newEventDto, userId);
     }
 

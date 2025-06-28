@@ -1,6 +1,5 @@
 package main.server.events.controllers;
 
-import jakarta.servlet.http.HttpServletRequest;
 import jakarta.validation.Valid;
 import jakarta.validation.constraints.Positive;
 import lombok.AccessLevel;
@@ -53,10 +52,8 @@ public class AdminController {
                                         LocalDateTime rangeEnd,
 
                                         @RequestParam(defaultValue = "0") Integer from,
-                                        @RequestParam(defaultValue = "10") Integer size,
-                                        HttpServletRequest request) {
+                                        @RequestParam(defaultValue = "10") Integer size) {
         log.info("Поступил запрос на обновление события для админа");
-        return adminService.getEventsWithAdminFilters(users, states, categories, rangeStart, rangeEnd, from, size,
-                request);
+        return adminService.getEventsWithAdminFilters(users, states, categories, rangeStart, rangeEnd, from, size);
     }
 }
