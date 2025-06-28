@@ -53,8 +53,10 @@ public class AdminController {
                                         LocalDateTime rangeEnd,
 
                                         @RequestParam(defaultValue = "0") Integer from,
-                                        @RequestParam(defaultValue = "10") Integer size) {
+                                        @RequestParam(defaultValue = "10") Integer size,
+                                        HttpServletRequest request) {
         log.info("Поступил запрос на обновление события для админа");
-        return adminService.getEventsWithAdminFilters(users, states, categories, rangeStart, rangeEnd, from, size);
+        return adminService.getEventsWithAdminFilters(users, states, categories, rangeStart, rangeEnd, from, size,
+                request);
     }
 }

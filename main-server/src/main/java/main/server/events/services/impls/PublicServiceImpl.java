@@ -52,7 +52,7 @@ public class PublicServiceImpl implements PublicService {
         // Send hit to stats service
         try {
             statsClient.postHit(EndpointHitDto.builder()
-                    .app("ewm-main-service")
+                    .app("main-service")
                     .uri(request.getRequestURI())
                     .ip(request.getRemoteAddr())
                     .timestamp(LocalDateTime.now())
