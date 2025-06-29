@@ -54,10 +54,10 @@ public class StatController {
      */
     @GetMapping("/stats")
     @ResponseStatus(HttpStatus.OK)
-    public List<ViewStatsDto> getStats(@RequestParam(name = "start")
+    public List<ViewStatsDto> getStats(@RequestParam(name = "start", required = true)
                                        @DateTimeFormat(pattern = DATE_TIME_FORMAT)
                                        LocalDateTime start,
-                                       @RequestParam(name = "end")
+                                       @RequestParam(name = "end", required = true)
                                        @DateTimeFormat(pattern = DATE_TIME_FORMAT)
                                        LocalDateTime end,
                                        @RequestParam(name = "uris", required = false) List<String> uris,

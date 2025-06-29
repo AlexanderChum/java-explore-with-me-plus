@@ -10,6 +10,7 @@ import stat.dto.EndpointHitDto;
 import stat.dto.ViewStatsDto;
 import stat.server.exception.ValidationException;
 import stat.server.mapper.StatMap;
+import stat.server.model.EndpointHit;
 import stat.server.repository.StatRepository;
 
 import java.time.LocalDateTime;
@@ -18,7 +19,6 @@ import java.util.List;
 @Service
 @RequiredArgsConstructor
 @Slf4j
-@Transactional(readOnly = true)
 @FieldDefaults(level = AccessLevel.PRIVATE, makeFinal = true)
 @SuppressWarnings("unused")
 public class StatServiceImpl implements StatService {
@@ -28,12 +28,17 @@ public class StatServiceImpl implements StatService {
     @Override
     @Transactional
     public EndpointHitDto saveHit(EndpointHitDto endpointHitDto) {
-        return statMap.toEndpointHitDto(statRepository.save(statMap.toEndpointHit(endpointHitDto)));
+        log.debug("Сохраняем запрос: app={}, uri={}, ip={}, timestamp={}",
+                endpointHitDto.getApp(), endpointHitDto.getUri(),
+                endpointHitDto.getIp(), endpointHitDto.getTimestamp());
+        EndpointHit savedHit = statRepository.save(statMap.toEndpointHit(endpointHitDto));
+        log.debug("Успешно сохранен с ID: {}", savedHit.getId());
+        return statMap.toEndpointHitDto(savedHit);
     }
 
     @Override
     public List<ViewStatsDto> getStats(LocalDateTime startDate, LocalDateTime endDate, List<String> uris, Boolean unique) {
-        log.debug("Service: Запрашиваем статистику с параметрами: start={}, end={}, uris={}, unique={}",
+        log.debug("Запрашиваем статистику с параметрами: start={}, end={}, uris={}, unique={}",
                 startDate, endDate, uris, unique);
 
         if (startDate.isAfter(endDate)) {
@@ -41,10 +46,16 @@ public class StatServiceImpl implements StatService {
             throw new ValidationException("Дата начала не должна быть позже даты окончания");
         }
 
+        List<ViewStatsDto> result;
         if (unique) {
-            return statRepository.getUniqueStats(startDate, endDate, uris);
+            log.debug("Запросы статистики для уникальных uri");
+            result = statRepository.getUniqueStats(startDate, endDate, uris);
         } else {
-            return statRepository.getStats(startDate, endDate, uris);
+            log.debug("Запросы статистики для неуникальных uri");
+            result = statRepository.getStats(startDate, endDate, uris);
         }
+
+        log.debug("Получен результат: {} ({} entries)", result, result != null ? result.size() : 0);
+        return result;
     }
 }
