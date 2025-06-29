@@ -139,4 +139,8 @@ public class PublicServiceImpl implements PublicService {
         }
         return viewsMap;
     }
+
+    public List<EventModel> findAllByCategoryId(Long catId) {
+        return eventRepository.findAllByCategoryId(catId);
+    }
 }

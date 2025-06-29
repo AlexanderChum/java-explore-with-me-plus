@@ -8,7 +8,7 @@ import main.server.category.mapper.CategoryMapper;
 import main.server.category.model.Category;
 import main.server.category.repository.CategoryRepository;
 import main.server.events.model.EventModel;
-import main.server.events.services.impls.PrivateServiceImpl;
+import main.server.events.services.impls.PublicServiceImpl;
 import main.server.exception.ConflictException;
 import main.server.exception.NotFoundException;
 import org.springframework.stereotype.Service;
@@ -24,7 +24,7 @@ import java.util.Optional;
 public class CategoryServiceImpl implements CategoryService {
 
     CategoryRepository categoryRepository;
-    PrivateServiceImpl eventService;
+    PublicServiceImpl eventService;
     CategoryMapper mapper;
 
     @Override

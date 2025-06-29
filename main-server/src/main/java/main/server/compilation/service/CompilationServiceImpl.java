@@ -33,7 +33,7 @@ import java.util.Set;
 public class CompilationServiceImpl implements CompilationService {
     private final CompilationRepository compilationRepository;
     private final CompilationMapper compilationMapper;
-    PrivateServiceImpl eventService;
+    private final PrivateServiceImpl eventService;
 
     @Transactional
     @Override
@@ -50,6 +50,8 @@ public class CompilationServiceImpl implements CompilationService {
         if (newCompilationDto.getEvents() != null && !newCompilationDto.getEvents().isEmpty()) {
             Set<EventModel> events = new HashSet<>(eventService.findAllById(new ArrayList<>(newCompilationDto.getEvents())));
             compilation.setEvents(events);
+        } else {
+            compilation.setEvents(new HashSet<>());
         }
         Compilation savedCompilation = compilationRepository.save(compilation);
         log.info("Создаем подборку");

@@ -11,7 +11,6 @@ import jakarta.persistence.Id;
 import jakarta.persistence.JoinColumn;
 import jakarta.persistence.ManyToOne;
 import jakarta.persistence.Table;
-import jakarta.validation.constraints.Min;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Size;
@@ -78,7 +77,6 @@ public class EventModel {
     @Column(name = "paid")
     Boolean paid;
 
-    @Min(1)
     @Column(name = "participant_limit")
     Long participantLimit;
 
@@ -90,7 +88,6 @@ public class EventModel {
     Boolean requestModeration;
 
     @NotNull(message = "State не должен быть пустым")
-    @Size(max = 20)
     @Enumerated(EnumType.STRING)
     @Column(name = "state")
     EventState state;

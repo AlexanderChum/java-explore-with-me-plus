@@ -219,10 +219,6 @@ public class PrivateServiceImpl implements PrivateService {
         return viewsMap;
     }
 
-    public List<EventModel> findAllByCategoryId(Long catId) {
-        return eventRepository.findAllByCategoryId(catId);
-    }
-
     public List<EventModel> findAllById(List<Long> ids) {
         return eventRepository.findAllById(ids);
     }
