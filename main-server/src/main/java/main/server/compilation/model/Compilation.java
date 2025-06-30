@@ -40,7 +40,7 @@ public class Compilation {
     @NotNull(message = "Pinned должен быть указан")
     private Boolean pinned;
 
-    @Column(nullable = false, length = 50)
+    @Column
     @NotBlank(message = "Заголовок не должен быть пустым")
     @Size(max = 50, message = "Заголовок не должен превышать 255 символов")
     private String title;

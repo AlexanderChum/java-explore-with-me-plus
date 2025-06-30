@@ -140,6 +140,7 @@ public class PublicServiceImpl implements PublicService {
         return viewsMap;
     }
 
+    @Override
     public List<EventModel> findAllByCategoryId(Long catId) {
         return eventRepository.findAllByCategoryId(catId);
     }
