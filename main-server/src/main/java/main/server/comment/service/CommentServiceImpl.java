@@ -120,7 +120,7 @@ public class CommentServiceImpl implements CommentService {
 
         if (!user.equals(comment.getAuthor())) {
             throw new ConflictException(String.format("Комментарий id= %d не был создан пользователем с id= %d",
-                    comment.getAuthor().getId(), user.getId()));
+                    comment.getId(), user.getId()));
         }
         log.info("Комментарий с id: {} успешно валидирован для события id: {} и пользователя id: {}", commentId, eventId, userId);
         return comment;

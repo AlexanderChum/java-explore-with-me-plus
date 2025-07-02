@@ -30,7 +30,7 @@ public class PrivateCommentController {
     CommentService commentService;
 
     @PostMapping
-    @ResponseStatus(HttpStatus.OK)
+    @ResponseStatus(HttpStatus.CREATED)
     public CommentDto createComment(@PathVariable("userId") @NotNull @Positive Long userId,
                                     @PathVariable("eventId") @NotNull @Positive Long eventId,
                                     @RequestBody @Valid NewCommentDto newCommentDto) {

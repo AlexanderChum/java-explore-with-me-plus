@@ -32,22 +32,22 @@ import java.time.LocalDateTime;
 public class Comment {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Long id;
+    Long id;
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "event_id")
-    private EventModel event;
+    EventModel event;
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "author_id")
-    private User author;
+    User author;
 
     @Column(name = "message")
-    private String message;
+    String message;
 
     @Column(name = "created_on")
-    private LocalDateTime createdOn;
+    LocalDateTime createdOn;
 
     @Column(name = "updated_on")
-    private LocalDateTime updatedOn;
+    LocalDateTime updatedOn;
 }
