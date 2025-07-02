@@ -17,4 +17,6 @@ public interface CommentService {
     CommentDto adminUpdate(Long eventId, Long commentId, NewCommentDto newCommentDto);
 
     void adminDelete(Long eventId, Long commentId);
+
+    CommentDto findByEventAndCommentId(Long eventId, Long commentId);
 }

@@ -118,7 +118,7 @@ public class CommentServiceImpl implements CommentService {
         User user = userRepository.findById(userId)
                 .orElseThrow(() -> new NotFoundException(String.format("Пользователь с id= %d не найден", userId)));
 
-        if (!user.equals(comment.getAuthor())) {
+        if (!user.getId().equals(comment.getAuthor().getId())) {
             throw new ConflictException(String.format("Комментарий id= %d не был создан пользователем с id= %d",
                     comment.getId(), user.getId()));
         }
@@ -140,5 +140,16 @@ public class CommentServiceImpl implements CommentService {
         }
         log.info("Комментарий с id: {} успешно валидирован для события id: {}", commentId, eventId);
         return comment;
+    }
+
+    @Override
+    public CommentDto findByEventAndCommentId(Long eventId, Long commentId) {
+        Comment comment = commentRepository.findById(commentId)
+                .orElseThrow(() -> new NotFoundException(String.format("Комментарий id= %d не найден", commentId)));
+        if (!Objects.equals(eventId, comment.getEvent().getId())) {
+            throw new ConflictException(String.format("Комментарий id= %d не относится к событию id= %d",
+                    comment.getId(), eventId));
+        }
+        return commentMapper.toCommentDto(comment);
     }
 }
