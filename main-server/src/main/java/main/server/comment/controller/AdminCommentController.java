@@ -52,8 +52,8 @@ public class AdminCommentController {
     @GetMapping
     @ResponseStatus(HttpStatus.OK)
     public List<CommentDto> getCommentsByEvent(@PathVariable("eventId") @NotNull @Positive Long eventId,
-                                                @RequestParam(name = "from", defaultValue = "0") int from,
-                                                @RequestParam(name = "size", defaultValue = "10") int size) {
+                                               @RequestParam(name = "from", defaultValue = "0") int from,
+                                               @RequestParam(name = "size", defaultValue = "10") int size) {
         log.info("Получен Admin-запрос списка комментариев по событию id: {}", eventId);
         return commentService.findAllByEvent(eventId, from, size);
     }
@@ -62,7 +62,7 @@ public class AdminCommentController {
     @ResponseStatus(HttpStatus.OK)
     public CommentDto findCommentByEventAndId(@PathVariable("eventId") @NotNull @Positive Long eventId,
                                               @PathVariable("commentId") @NotNull @Positive Long commentId) {
-        log.info("Получен Admin-запрос одного комментария id: {} по событию id: {}", commentId,eventId);
+        log.info("Получен Admin-запрос одного комментария id: {} по событию id: {}", commentId, eventId);
         return commentService.findByEventAndCommentId(eventId, commentId);
     }
 }

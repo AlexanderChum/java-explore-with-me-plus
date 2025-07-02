@@ -85,7 +85,8 @@ public class CommentServiceImpl implements CommentService {
     @Override
     @Transactional
     public void delete(Long userId, Long eventId, Long commentId) {
-        log.info("Запрос на удаление комментария с id: {} пользователем id: {} для события id: {}", commentId, userId, eventId);
+        log.info("Запрос на удаление комментария с id: {} пользователем id: {} для события id: {}", commentId,
+                userId, eventId);
         Comment comment = validateCommentForEventAndUser(eventId, commentId, userId);
         commentRepository.delete(comment);
         log.info("Комментарий с id: {} был успешно удален пользователем id: {}", commentId, userId);
@@ -111,8 +112,20 @@ public class CommentServiceImpl implements CommentService {
         log.info("Комментарий с id: {} был успешно удален администратором для события id: {}", commentId, eventId);
     }
 
+    @Override
+    public CommentDto findByEventAndCommentId(Long eventId, Long commentId) {
+        Comment comment = commentRepository.findById(commentId)
+                .orElseThrow(() -> new NotFoundException(String.format("Комментарий id= %d не найден", commentId)));
+        if (!Objects.equals(eventId, comment.getEvent().getId())) {
+            throw new ConflictException(String.format("Комментарий id= %d не относится к событию id= %d",
+                    comment.getId(), eventId));
+        }
+        return commentMapper.toCommentDto(comment);
+    }
+
     private Comment validateCommentForEventAndUser(Long eventId, Long commentId, Long userId) {
-        log.info("Валидация комментария с id: {} для события с id: {} и пользователя с id: {}", commentId, eventId, userId);
+        log.info("Валидация комментария с id: {} для события с id: {} и пользователя с id: {}", commentId, eventId,
+                userId);
         Comment comment = validateCommentForEvent(eventId, commentId);
 
         User user = userRepository.findById(userId)
@@ -122,7 +135,8 @@ public class CommentServiceImpl implements CommentService {
             throw new ConflictException(String.format("Комментарий id= %d не был создан пользователем с id= %d",
                     comment.getId(), user.getId()));
         }
-        log.info("Комментарий с id: {} успешно валидирован для события id: {} и пользователя id: {}", commentId, eventId, userId);
+        log.info("Комментарий с id: {} успешно валидирован для события id: {} и пользователя id: {}", commentId,
+                eventId, userId);
         return comment;
     }
 
@@ -140,16 +154,5 @@ public class CommentServiceImpl implements CommentService {
         }
         log.info("Комментарий с id: {} успешно валидирован для события id: {}", commentId, eventId);
         return comment;
-    }
-
-    @Override
-    public CommentDto findByEventAndCommentId(Long eventId, Long commentId) {
-        Comment comment = commentRepository.findById(commentId)
-                .orElseThrow(() -> new NotFoundException(String.format("Комментарий id= %d не найден", commentId)));
-        if (!Objects.equals(eventId, comment.getEvent().getId())) {
-            throw new ConflictException(String.format("Комментарий id= %d не относится к событию id= %d",
-                    comment.getId(), eventId));
-        }
-        return commentMapper.toCommentDto(comment);
     }
 }

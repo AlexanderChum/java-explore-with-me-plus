@@ -7,7 +7,7 @@ import main.server.user.UserMapper;
 import org.mapstruct.Mapper;
 import org.mapstruct.Mapping;
 
-@Mapper(componentModel = "spring", uses = { UserMapper.class })
+@Mapper(componentModel = "spring", uses = {UserMapper.class})
 public interface CommentMapper {
 
     @Mapping(target = "author", source = "author")
