@@ -33,8 +33,8 @@ public class AdminCommentController {
     CommentService commentService;
 
     @PatchMapping("/{commentId}")
-    public CommentDto updateComment(@PathVariable("eventId") @NotNull @Positive Long eventId,
-                                    @PathVariable("commentId") @NotNull @Positive Long commentId,
+    public CommentDto updateComment(@PathVariable @NotNull @Positive Long eventId,
+                                    @PathVariable @NotNull @Positive Long commentId,
                                     @RequestBody @Valid NewCommentDto updateCommentDto) {
         log.info("Поступил Admin-запрос на обновление комментария id: {} для события id: {}", commentId, eventId);
         return commentService.adminUpdate(eventId, commentId, updateCommentDto);
@@ -42,24 +42,23 @@ public class AdminCommentController {
 
     @DeleteMapping("/{commentId}")
     @ResponseStatus(HttpStatus.NO_CONTENT)
-    public void deleteComment(@PathVariable("eventId") @NotNull @Positive Long eventId,
-                              @PathVariable("commentId") @NotNull @Positive Long commentId) {
+    public void deleteComment(@PathVariable @NotNull @Positive Long eventId,
+                              @PathVariable @NotNull @Positive Long commentId) {
         log.info("Поступил Admin-запрос на удаление комментария id: {} для события id: {}", commentId, eventId);
         commentService.adminDelete(eventId, commentId);
     }
 
     @GetMapping
-    public List<CommentDto> getCommentsByEvent(@PathVariable("eventId") @NotNull @Positive Long eventId,
-                                               @RequestParam(defaultValue = "0") int from,
+    public List<CommentDto> getCommentsByEvent(@PathVariable @NotNull @Positive Long eventId,
+                                               @RequestParam(name = "from", defaultValue = "0") int from,
                                                @RequestParam(name = "size", defaultValue = "10") int size) {
         log.info("Получен Admin-запрос списка комментариев по событию id: {}", eventId);
         return commentService.findAllByEvent(eventId, from, size);
     }
 
     @GetMapping("/{commentId}")
-    @ResponseStatus(HttpStatus.OK)
-    public CommentDto findCommentByEventAndId(@PathVariable("eventId") @NotNull @Positive Long eventId,
-                                              @PathVariable("commentId") @NotNull @Positive Long commentId) {
+    public CommentDto findCommentByEventAndId(@PathVariable @NotNull @Positive Long eventId,
+                                              @PathVariable @NotNull @Positive Long commentId) {
         log.info("Получен Admin-запрос одного комментария id: {} по событию id: {}", commentId, eventId);
         return commentService.findByEventAndCommentId(eventId, commentId);
     }

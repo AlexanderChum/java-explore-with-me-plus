@@ -31,18 +31,17 @@ public class PrivateCommentController {
 
     @PostMapping
     @ResponseStatus(HttpStatus.CREATED)
-    public CommentDto createComment(@PathVariable("userId") @NotNull @Positive Long userId,
-                                    @PathVariable("eventId") @NotNull @Positive Long eventId,
+    public CommentDto createComment(@PathVariable @NotNull @Positive Long userId,
+                                    @PathVariable @NotNull @Positive Long eventId,
                                     @RequestBody @Valid NewCommentDto newCommentDto) {
         log.info("Сохранение комментария для пользователя id: {} и события id: {}", userId, eventId);
         return commentService.create(userId, eventId, newCommentDto);
     }
 
     @PatchMapping("/{commentId}")
-    @ResponseStatus(HttpStatus.OK)
-    public CommentDto updateComment(@PathVariable("userId") @NotNull @Positive Long userId,
-                                    @PathVariable("eventId") @NotNull @Positive Long eventId,
-                                    @PathVariable("commentId") @NotNull @Positive Long commentId,
+    public CommentDto updateComment(@PathVariable @NotNull @Positive Long userId,
+                                    @PathVariable @NotNull @Positive Long eventId,
+                                    @PathVariable @NotNull @Positive Long commentId,
                                     @RequestBody @Valid NewCommentDto updateCommentDto) {
         log.info("Обновление комментария id: {} для пользователя id: {} и события id: {}", commentId, userId, eventId);
         return commentService.update(userId, eventId, commentId, updateCommentDto);
@@ -50,9 +49,9 @@ public class PrivateCommentController {
 
     @DeleteMapping("/{commentId}")
     @ResponseStatus(HttpStatus.NO_CONTENT)
-    public void deleteComment(@PathVariable Long userId,
-                              @PathVariable Long eventId,
-                              @PathVariable Long commentId) {
+    public void deleteComment(@PathVariable @NotNull @Positive Long userId,
+                              @PathVariable @NotNull @Positive Long eventId,
+                              @PathVariable @NotNull @Positive Long commentId) {
         log.info("Удаление комментария id: {} для пользователя id: {} и события id: {}", commentId, userId, eventId);
         commentService.delete(userId, eventId, commentId);
     }
