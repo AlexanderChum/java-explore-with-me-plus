@@ -33,7 +33,6 @@ public class AdminCommentController {
     CommentService commentService;
 
     @PatchMapping("/{commentId}")
-    @ResponseStatus()
     public CommentDto updateComment(@PathVariable("eventId") @NotNull @Positive Long eventId,
                                     @PathVariable("commentId") @NotNull @Positive Long commentId,
                                     @RequestBody @Valid NewCommentDto updateCommentDto) {
@@ -50,7 +49,6 @@ public class AdminCommentController {
     }
 
     @GetMapping
-    @ResponseStatus()
     public List<CommentDto> getCommentsByEvent(@PathVariable("eventId") @NotNull @Positive Long eventId,
                                                @RequestParam(defaultValue = "0") int from,
                                                @RequestParam(name = "size", defaultValue = "10") int size) {
