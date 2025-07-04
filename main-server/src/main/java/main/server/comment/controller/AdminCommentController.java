@@ -33,7 +33,7 @@ public class AdminCommentController {
     CommentService commentService;
 
     @PatchMapping("/{commentId}")
-    @ResponseStatus(HttpStatus.OK)
+    @ResponseStatus()
     public CommentDto updateComment(@PathVariable("eventId") @NotNull @Positive Long eventId,
                                     @PathVariable("commentId") @NotNull @Positive Long commentId,
                                     @RequestBody @Valid NewCommentDto updateCommentDto) {
@@ -50,9 +50,9 @@ public class AdminCommentController {
     }
 
     @GetMapping
-    @ResponseStatus(HttpStatus.OK)
+    @ResponseStatus()
     public List<CommentDto> getCommentsByEvent(@PathVariable("eventId") @NotNull @Positive Long eventId,
-                                               @RequestParam(name = "from", defaultValue = "0") int from,
+                                               @RequestParam(defaultValue = "0") int from,
                                                @RequestParam(name = "size", defaultValue = "10") int size) {
         log.info("Получен Admin-запрос списка комментариев по событию id: {}", eventId);
         return commentService.findAllByEvent(eventId, from, size);
