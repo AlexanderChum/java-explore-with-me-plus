@@ -4,9 +4,11 @@ import jakarta.validation.ValidationException;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.MethodArgumentNotValidException;
+import org.springframework.web.bind.MissingServletRequestParameterException;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
+import org.springframework.web.method.annotation.HandlerMethodValidationException;
 
 import java.time.LocalDateTime;
 
@@ -14,7 +16,10 @@ import java.time.LocalDateTime;
 @RestControllerAdvice()
 @SuppressWarnings("unused")
 public class ErrorHandler {
-    @ExceptionHandler({MethodArgumentNotValidException.class, ValidationException.class})
+    @ExceptionHandler({MethodArgumentNotValidException.class,
+            MissingServletRequestParameterException.class,
+            ValidationException.class,
+            HandlerMethodValidationException.class})
     @ResponseStatus(HttpStatus.BAD_REQUEST)
     public ApiError validationExceptionHandle(Exception e) {
         log.error("Validation error: ", e);
@@ -62,9 +67,9 @@ public class ErrorHandler {
                 .build();
     }
 
-    @ExceptionHandler()
+    @ExceptionHandler(BadRequestException.class)
     @ResponseStatus(HttpStatus.BAD_REQUEST)
-    public ApiError badRequestExceptionHandle(final BadRequestException e) {
+    public ApiError badRequestExceptionHandle(Exception e) {
         log.error("Bad Request Exception error: ", e);
         return ApiError.builder()
                 .status(HttpStatus.BAD_REQUEST)
@@ -74,9 +79,9 @@ public class ErrorHandler {
                 .build();
     }
 
-    @ExceptionHandler({InternalServerException.class, Throwable.class})
+    @ExceptionHandler(Throwable.class)
     @ResponseStatus(HttpStatus.INTERNAL_SERVER_ERROR)
-    public ApiError internalServerExceptionHandle(InternalServerException e) {
+    public ApiError internalServerExceptionHandle(Exception e) {
         log.error("Internal Server Exception error: ", e);
         return ApiError.builder()
                 .status(HttpStatus.INTERNAL_SERVER_ERROR)
