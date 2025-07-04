@@ -73,4 +73,16 @@ public class ErrorHandler {
                 .timestamp(LocalDateTime.now())
                 .build();
     }
+
+    @ExceptionHandler(Throwable.class)
+    @ResponseStatus(HttpStatus.INTERNAL_SERVER_ERROR)
+    public ApiError handleException(Throwable e) {
+        log.error("Internal Server Error: ", e);
+        return ApiError.builder()
+                .status(HttpStatus.INTERNAL_SERVER_ERROR)
+                .reason("Внутренняя ошибка сервера")
+                .message(e.getMessage())
+                .timestamp(LocalDateTime.now())
+                .build();
+    }
 }
