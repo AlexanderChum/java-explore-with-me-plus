@@ -14,9 +14,9 @@ import java.time.LocalDateTime;
 @RestControllerAdvice()
 @SuppressWarnings("unused")
 public class ErrorHandler {
-    @ExceptionHandler({MethodArgumentNotValidException.class, ValidationException.class})
+    @ExceptionHandler()
     @ResponseStatus(HttpStatus.BAD_REQUEST)
-    public ApiError validationExceptionHandle(Exception e) {
+    public ApiError validationExceptionHandle(final MethodArgumentNotValidException e, final ValidationException v) {
         log.error("Validation error: ", e);
         return ApiError.builder()
                 .status(HttpStatus.BAD_REQUEST)
@@ -26,9 +26,9 @@ public class ErrorHandler {
                 .build();
     }
 
-    @ExceptionHandler(DuplicatedDataException.class)
+    @ExceptionHandler()
     @ResponseStatus(HttpStatus.CONFLICT)
-    public ApiError repositoryDuplicatedDataExceptionHandle(Exception e) {
+    public ApiError repositoryDuplicatedDataExceptionHandle(final DuplicatedDataException e) {
         log.error("Duplicated Data Exception error: ", e);
         return ApiError.builder()
                 .status(HttpStatus.CONFLICT)
@@ -38,9 +38,9 @@ public class ErrorHandler {
                 .build();
     }
 
-    @ExceptionHandler(NotFoundException.class)
+    @ExceptionHandler()
     @ResponseStatus(HttpStatus.NOT_FOUND)
-    public ApiError repositoryNotFoundExceptionHandle(Exception e) {
+    public ApiError repositoryNotFoundExceptionHandle(final NotFoundException e) {
         log.error("Not Found Exception error: ", e);
         return ApiError.builder()
                 .status(HttpStatus.NOT_FOUND)
@@ -50,9 +50,9 @@ public class ErrorHandler {
                 .build();
     }
 
-    @ExceptionHandler(ConflictException.class)
+    @ExceptionHandler()
     @ResponseStatus(HttpStatus.CONFLICT)
-    public ApiError exceptionHandle(Exception e) {
+    public ApiError exceptionHandle(final ConflictException e) {
         log.error("CONFLICT error: ", e);
         return ApiError.builder()
                 .status(HttpStatus.CONFLICT)
@@ -62,13 +62,25 @@ public class ErrorHandler {
                 .build();
     }
 
-    @ExceptionHandler(BadRequestException.class)
+    @ExceptionHandler()
     @ResponseStatus(HttpStatus.BAD_REQUEST)
-    public ApiError badRequestExceptionHandle(Exception e) {
+    public ApiError badRequestExceptionHandle(final BadRequestException e) {
         log.error("Bad Request Exception error: ", e);
         return ApiError.builder()
                 .status(HttpStatus.BAD_REQUEST)
                 .reason("Некорректный запрос")
+                .message(e.getMessage())
+                .timestamp(LocalDateTime.now())
+                .build();
+    }
+
+    @ExceptionHandler()
+    @ResponseStatus(HttpStatus.INTERNAL_SERVER_ERROR)
+    public ApiError handleException(final Throwable e) {
+        log.error("Internal Server Error: ", e);
+        return ApiError.builder()
+                .status(HttpStatus.INTERNAL_SERVER_ERROR)
+                .reason("Внутренняя ошибка сервера")
                 .message(e.getMessage())
                 .timestamp(LocalDateTime.now())
                 .build();
